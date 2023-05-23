@@ -5,6 +5,9 @@ export const preloadTextures = function(callback) {
   // Array to store the paths of the texture images
   const texturePaths = [
     "./textures/player.png",
+    "./textures/background-repeat-1.png",
+    "./textures/background-repeat-2.png",
+    "./textures/small-red-bullet.png",
   ];
   // Counter to keep track of the loaded texture images
   let loadedCount = 0;

@@ -15,7 +15,7 @@ export class GameObjectsComponent {
     const texture = textureImages[`./textures/${this.textureName}`];
     context.save();
     context.translate(this.x, this.y);
-    context.rotate(this.angle);
+    context.rotate(this.angle * Math.PI / 180);
     context.drawImage(
       texture,
       this.width / -2,
@@ -30,6 +30,6 @@ export class GameObjectsComponent {
     this.y += moveY;
   }
   rotation(rotationAngle) {
-    this.angle += (rotationAngle * Math.PI) / 180;
+    this.angle += rotationAngle
   }
 }
