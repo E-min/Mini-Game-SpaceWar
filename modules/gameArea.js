@@ -1,4 +1,4 @@
-import { GameObjectsComponent } from "./gameObjectsComponent.js";
+import { playerFunctions } from "./playerFunctions.js";
 
 export const gameArea = {
   canvas: document.createElement("canvas"),
@@ -25,10 +25,9 @@ export const gameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
 };
-const player = new GameObjectsComponent(40, 40, "player.png", 175, 400);
 
 // place functions that renders in game
 export const updateGameArea = () => {
   gameArea.clear();
-  player.update();
+  playerFunctions();
 };

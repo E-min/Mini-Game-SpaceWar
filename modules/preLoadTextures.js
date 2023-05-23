@@ -1,7 +1,7 @@
 // Object to store the loaded texture images
 export const textureImages = {};
 
-export const preloadTextures = function (callback) {
+export const preloadTextures = function(callback) {
   // Array to store the paths of the texture images
   const texturePaths = [
     "./textures/player.png",
