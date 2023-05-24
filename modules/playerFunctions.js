@@ -21,6 +21,7 @@ const movement = () => {
     player.movement(2, 0);
   }
 };
+
 export const evade = (direction) => {
   animate(direction);
 };
@@ -45,29 +46,25 @@ const animate = (direction) => {
 };
 
 const bullets = [];
-
 let pastTime = Date.now();
+
 const bulletGenerator = () => {
-  const update = () => {
-    const currentTime = Date.now();
-    const delta = currentTime - pastTime;
-    if (delta >= 200) {
-      const newBullet = new GameObjectsComponent(
-        7,
-        10,
-        "small-red-bullet.png",
-        player.x + 18,
-        player.y + 5
+  const currentTime = Date.now();
+  const delta = currentTime - pastTime;
+  if (delta >= 100) {
+    if (bullets.length <= 10) {
+      bullets.push(
+        new GameObjectsComponent(7, 10, "small-red-bullet.png", 0, 0)
       );
-      bullets.push(newBullet);
-      pastTime = currentTime;
     }
-    requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
+    pastTime = currentTime;
+  }
+  requestAnimationFrame(bulletGenerator);
 };
+requestAnimationFrame(bulletGenerator);
+
 const renderBullets = () => {
-  for (let i = 0; i < bullets.length; i++) {
+  for (let i = bullets.length - 1; i >= 0; i--) {
     bullets[i].movement(0, -5);
     bullets[i].update();
     if (
@@ -76,13 +73,14 @@ const renderBullets = () => {
       bullets[i].x < 0 ||
       bullets[i].x > gameArea.canvas.width
     ) {
-      bullets.splice(i, 1);
+      bullets[i].y = player.y;
+      bullets[i].x = player.x;
     }
   }
 };
+
 export const playerFunctions = () => {
   movement();
   player.update();
-  bulletGenerator();
   renderBullets();
 };

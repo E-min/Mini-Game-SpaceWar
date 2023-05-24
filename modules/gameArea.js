@@ -1,3 +1,4 @@
+import { enemyFunctions } from "./EnemyFunctions.js";
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { playerFunctions } from "./playerFunctions.js";
 
@@ -46,6 +47,7 @@ export const updateGameArea = () => {
   gameArea.clear();
   backgroundRepeat();
   playerFunctions();
+  enemyFunctions()
 };
 
 const backgroundRepeat = () => {

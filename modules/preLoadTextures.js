@@ -8,6 +8,7 @@ export const preloadTextures = function(callback) {
     "./textures/background-repeat-1.png",
     "./textures/background-repeat-2.png",
     "./textures/small-red-bullet.png",
+    "./textures/enemy-mini-drone.png",
   ];
   // Counter to keep track of the loaded texture images
   let loadedCount = 0;
