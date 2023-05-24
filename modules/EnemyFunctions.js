@@ -1,7 +1,6 @@
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { bullets } from "./playerFunctions.js";
 
-
 class Enemies extends GameObjectsComponent {
   constructor(width, height, textureName, x, y) {
     super();
@@ -18,7 +17,6 @@ class Enemies extends GameObjectsComponent {
     this.destroyed = true;
     let animateFrames = 1;
     const update = () => {
-      console.log(animateFrames);
       const currentTime = Date.now();
       const delta = currentTime - startExpolision;
       if (animateFrames === 6) {

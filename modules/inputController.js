@@ -38,6 +38,7 @@ const keyPress = () => {
   //       }
   //     });
   //   });
+  
   //******************************************
   // event listener for keyboard keys
   document.addEventListener("keydown", function (event) {
@@ -114,5 +115,4 @@ const doubleTapLeft = () => {
     }
   }
 };
-
 keyPress();
