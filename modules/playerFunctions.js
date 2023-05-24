@@ -64,10 +64,11 @@ const bulletGenerator = () => {
         )
       );
     }
-    if (index === bullets.length - 1) {
+    if (index === bullets.length) {
       index = 0;
     }
     if (bullets.length === maxBulletAmount) {
+      bullets[index].hit = false;
       bullets[index].x = player.x;
       bullets[index].y = player.y;
       bullets[index].width = 7;
@@ -81,7 +82,7 @@ requestAnimationFrame(bulletGenerator);
 
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
-    bullets[i].movement(0, -5);
+    if (!bullets[i].hit) bullets[i].movement(0, -5);
     bullets[i].update();
   }
 };

@@ -1,8 +1,7 @@
-import { enemyFunctions } from "./EnemyFunctions.js";
+import { enemiesFunctions } from "./enemyFunctions.js";
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { playerFunctions } from "./playerFunctions.js";
 
-const globalMilisecond = Date.now()
 export const gameArea = {
   canvas: document.createElement("canvas"),
   fps: 60,
@@ -47,7 +46,7 @@ export const updateGameArea = () => {
   gameArea.clear();
   backgroundRepeat();
   playerFunctions();
-  enemyFunctions()
+  enemiesFunctions()
 };
 
 const backgroundRepeat = () => {

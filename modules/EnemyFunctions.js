@@ -1,8 +1,7 @@
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { bullets } from "./playerFunctions.js";
 
-let startExpolision = Date.now();
-let animateFrames = 1;
+
 class Enemies extends GameObjectsComponent {
   constructor(width, height, textureName, x, y) {
     super();
@@ -12,22 +11,26 @@ class Enemies extends GameObjectsComponent {
     this.y = y;
     this.textureName = textureName;
     this.angle = 0;
+    this.destroyed = false;
   }
   expolision() {
+    let startExpolision = Date.now();
+    this.destroyed = true;
+    let animateFrames = 1;
     const update = () => {
+      console.log(animateFrames);
       const currentTime = Date.now();
       const delta = currentTime - startExpolision;
-      if (delta >= 200) {
+      if (animateFrames === 6) {
+        this.width = 0;
+        return;
+      }
+      if (delta >= 100) {
         this.width = 30;
         this.height = 30;
         this.textureName = `expolision-frame-${animateFrames}.png`;
-        startExpolision = currentTime;
-        if (animateFrames === 5) {
-          this.width = 0;
-          this.height = 0;
-          return;
-        }
         animateFrames++;
+        startExpolision = currentTime;
       }
       requestAnimationFrame(update);
     };
@@ -43,19 +46,31 @@ class Enemies extends GameObjectsComponent {
         causeOfObjects[i].x < right &&
         causeOfObjects[i].x > left
       ) {
-        causeOfObjects[i].width = 0;
         this.expolision();
+        causeOfObjects[i].hit = true;
+        causeOfObjects[i].width = 0;
       }
     }
   }
 }
-
-const enemyDrone = new Enemies(20, 20, "enemy-mini-drone.png", 175, 100);
-const generateEnemies = () => {
-  enemyDrone.update();
-  enemyDrone.damageDetect(bullets);
-  //   enemyDrone.angle = 270;
+const enemyDrones = [];
+for (let i = 0; i < 10; i++) {
+  const enemyDrone = new Enemies(
+    20,
+    20,
+    "enemy-mini-drone.png",
+    175,
+    30 + i * 30
+  );
+  enemyDrones.push(enemyDrone);
+}
+const renderEnemies = () => {
+  for (let i = 0; i < enemyDrones.length; i++) {
+    const enemydrone = enemyDrones[i];
+    !enemydrone.destroyed && enemydrone.damageDetect(bullets);
+    enemydrone.update();
+  }
 };
-export const enemyFunctions = () => {
-  generateEnemies();
+export const enemiesFunctions = () => {
+  renderEnemies();
 };

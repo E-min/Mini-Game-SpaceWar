@@ -9,6 +9,7 @@ export class GameObjectsComponent {
     this.y = y;
     this.textureName = textureName;
     this.angle = 0;
+    this.hit = false;
   }
   update() {
     const context = gameArea.context;
