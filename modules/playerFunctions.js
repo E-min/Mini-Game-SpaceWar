@@ -1,4 +1,3 @@
-import { gameArea } from "./gameArea.js";
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { keys } from "./inputController.js";
 
@@ -45,17 +44,34 @@ const animate = (direction) => {
   requestAnimationFrame(update);
 };
 
-const bullets = [];
+export const bullets = [];
 let pastTime = Date.now();
+let index = 0;
+const maxBulletAmount = 10;
 
 const bulletGenerator = () => {
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
-  if (delta >= 100) {
-    if (bullets.length <= 10) {
+  if (delta >= 300) {
+    if (bullets.length < maxBulletAmount) {
       bullets.push(
-        new GameObjectsComponent(7, 10, "small-red-bullet.png", 0, 0)
+        new GameObjectsComponent(
+          7,
+          20,
+          "small-red-bullet.png",
+          player.x,
+          player.y
+        )
       );
+    }
+    if (index === bullets.length - 1) {
+      index = 0;
+    }
+    if (bullets.length === maxBulletAmount) {
+      bullets[index].x = player.x;
+      bullets[index].y = player.y;
+      bullets[index].width = 7;
+      index++;
     }
     pastTime = currentTime;
   }
@@ -64,18 +80,9 @@ const bulletGenerator = () => {
 requestAnimationFrame(bulletGenerator);
 
 const renderBullets = () => {
-  for (let i = bullets.length - 1; i >= 0; i--) {
+  for (let i = 0; i < bullets.length; i++) {
     bullets[i].movement(0, -5);
     bullets[i].update();
-    if (
-      bullets[i].y < 0 ||
-      bullets[i].y > gameArea.canvas.height ||
-      bullets[i].x < 0 ||
-      bullets[i].x > gameArea.canvas.width
-    ) {
-      bullets[i].y = player.y;
-      bullets[i].x = player.x;
-    }
   }
 };
 
