@@ -3,14 +3,14 @@ import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { playerFunctions } from "./playerFunctions.js";
 
 export const gameArea = {
-  canvas: document.getElementById('canvas'),
+  canvas: document.createElement('canvas'),
   fps: 60,
   miliseconds: Date.now(),
   start: function () {
     this.canvas.height = 500;
     this.canvas.width = 350;
     this.context = this.canvas.getContext("2d");
-    // document.body.prepend(this.canvas);
+    document.body.prepend(this.canvas);
     let previousTime = this.miliseconds;
     const frameRefresher = () => {
       const currentTime = Date.now();
