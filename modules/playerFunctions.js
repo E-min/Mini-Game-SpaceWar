@@ -3,22 +3,32 @@ import { keys } from "./inputController.js";
 
 export const player = new GameObjectsComponent(40, 40, "player.png", 175, 400);
 
+const playerSpeed = 2;
+let playerSpeedX;
 let playerSpeedY;
+
 const movement = () => {
-  if (keys.upKeyPressed) {
-    player.movement(0, -2);
-    playerSpeedY = -2;
-  } else if (keys.downKeyPressed) {
-    player.movement(0, 2);
-    playerSpeedY = 2;
+  const right = keys.rightKeyPressed;
+  const left = keys.leftKeyPressed;
+  const up = keys.upKeyPressed;
+  const down = keys.downKeyPressed;
+  if (up) {
+    playerSpeedY = -playerSpeed;
+  } else if (down) {
+    playerSpeedY = playerSpeed;
   } else {
     playerSpeedY = 0;
   }
-  if (keys.leftKeyPressed) {
-    player.movement(-2, 0);
-  } else if (keys.rightKeyPressed) {
-    player.movement(2, 0);
+  if (left && !right) {
+    playerSpeedX = -playerSpeed;
   }
+  if (right && !left) {
+    playerSpeedX = playerSpeed;
+  }
+  if (!right && !left) {
+    playerSpeedX = 0;
+  }
+  player.movement(playerSpeedX, playerSpeedY);
 };
 
 export const evade = (direction) => {

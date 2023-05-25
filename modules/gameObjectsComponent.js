@@ -26,7 +26,7 @@ export class GameObjectsComponent {
     );
     context.restore();
   }
-  movement(moveX, moveY) {
+  movement(moveX = 0, moveY = 0) {
     this.x += moveX;
     this.y += moveY;
   }
