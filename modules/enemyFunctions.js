@@ -21,8 +21,6 @@ class EnemiesComponent extends GameObjectsComponent {
   }
   //*******************************************************************
   expolision() {
-    const lastXBeforeExpolision = this.x;
-    const lastYBeforeExpolision = this.y;
     let startExpolision = Date.now();
     this.destroyed = true;
     let animateFrames = 1;
@@ -51,6 +49,8 @@ class EnemiesComponent extends GameObjectsComponent {
     const right = this.x + this.width / 2;
     const left = this.x - this.width / 2;
     for (let i = 0; i < causeOfObjects.length; i++) {
+      // if bullet did hit pass the collision check
+      if (causeOfObjects[i].hit) continue;
       if (
         causeOfObjects[i].y < frontFace &&
         causeOfObjects[i].y > backFace &&
@@ -59,14 +59,13 @@ class EnemiesComponent extends GameObjectsComponent {
       ) {
         this.expolision();
         causeOfObjects[i].hit = true;
-        causeOfObjects[i].width = 0;
       }
     }
   }
   //*******************************************************************
-  animationChain(...orders) {
+  animationChain(orders) {
     let currentOrderIndex = 0;
-    const totalFramesOnEachAnimationSet = 50;
+    const totalFramesOnEachAnimationSet = 40;
     const animateOrder = () => {
       const order = orders[currentOrderIndex];
       let lastTime = Date.now();
@@ -91,6 +90,15 @@ class EnemiesComponent extends GameObjectsComponent {
         const finishX = orders[currentOrderIndex].finishX;
         const finishY = orders[currentOrderIndex].finishY;
         const motionType = orders[currentOrderIndex].motionType;
+        // angle calculation
+        const deltaX = finishX - startX;
+        const deltaY = finishY - startY;
+        const angleInRadians = Math.atan2(deltaY, deltaX);
+        const angleInDegrees = (angleInRadians * 180) / Math.PI;
+        // Ensure the angle is within the range of 0 to 360 degrees
+        const normalizedAngle = (angleInDegrees + 360) % 360;
+        this.angle = normalizedAngle + 180; // extra angle add to get frontface
+        //******************
         if (motionType === "straight") {
           velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
           velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
@@ -101,7 +109,6 @@ class EnemiesComponent extends GameObjectsComponent {
         }
         if (delta >= 1000 / 60) {
           this.movement(velocityX, velocityY);
-
           animateFrames++;
           lastTime = currentTime;
         }
@@ -116,39 +123,85 @@ class EnemiesComponent extends GameObjectsComponent {
     }
   }
 }
-
+//***********************new enemy add*********************************
 const enemyDrones = [];
-for (let i = 0; i < 2; i++) {
+const enemySpawnPoint = {
+  x: 175,
+  y: -100,
+};
+for (let i = 0; i < 10; i++) {
   const enemyDrone = new EnemiesComponent(
     20,
     20,
     "enemy-mini-drone.png",
-    175,
-    30 + i * 30
+    enemySpawnPoint.x,
+    enemySpawnPoint.y
   );
   enemyDrones.push(enemyDrone);
 }
-
-enemyDrones[1].animationChain(
-  {
-    startX: 100,
-    startY: 100,
-    finishX: 200,
-    finishY: 150,
-    motionType: "straight",
-  },
-  {
-    startX: 200,
-    startY: 150,
-    finishX: 175,
-    finishY: 300,
-    motionType: "straight",
-  }
+//*********************************************************************
+//***********************enemy formations******************************
+const gridTable = (...orders) => {
+  let lastTime = Date.now();
+  let enemyIndex = 0;
+  const update = () => {
+    const currentTime = Date.now();
+    const delta = currentTime - lastTime;
+    if (enemyIndex === enemyDrones.length - 1 || !enemyDrones[enemyIndex]) {
+      return;
+    }
+    //***********grid positions*****************
+    const moveSets = [];
+    const enemyStartPoint = {
+      x: enemySpawnPoint.x,
+      y: enemySpawnPoint.y,
+    };
+    const words = "ABCDEFGHI";
+    const gridwidth = 35;
+    for (let i = 0; i < orders[enemyIndex].length; i++) {
+      const xAxis = (words.indexOf(orders[enemyIndex][i][0]) + 1) * gridwidth;
+      const yAxis = orders[enemyIndex][i][1] * gridwidth;
+      const moveSet = {
+        startX: enemyStartPoint.x,
+        startY: enemyStartPoint.y,
+        finishX: xAxis,
+        finishY: yAxis,
+        motionType: "straight",
+      };
+      moveSets.push(moveSet);
+      enemyStartPoint.x = xAxis;
+      enemyStartPoint.y = yAxis;
+    }
+    //********************************************
+    //************* iteration section*************
+    if (delta >= 500) {
+      enemyDrones[enemyIndex].animationChain(moveSets);
+      enemyIndex++;
+      lastTime = currentTime;
+    }
+    //********************************************
+    requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+};
+//********************************************************************
+gridTable(
+  ["A1", "A5"],
+  ["A1", "B4"],
+  ["A1", "C3"],
+  ["A1", "D2"],
+  ["E0", "E1"],
+  ["H1", "F2"],
+  ["H1", "G3"],
+  ["H1", "H4"],
+  ["H1", "I5"]
 );
 
 const renderEnemies = () => {
   for (let i = enemyDrones.length - 1; i >= 0; i--) {
-    if (!enemyDrones[i]) continue;
+    if (!enemyDrones[i]) {
+      continue;
+    }
     enemyDrones[i].update();
     if (enemyDrones[i].destroyed) {
       const animationDuration = enemyDrones[i].animationTime;
@@ -158,7 +211,7 @@ const renderEnemies = () => {
       }, animationDuration + extraTimeForLastFrame);
       continue;
     }
-    enemyDrones[i].angle = 220;
+    enemyDrones[i].angle = 270;
     enemyDrones[i].damageDetect(bullets);
   }
 };

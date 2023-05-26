@@ -62,7 +62,7 @@ const maxBulletAmount = 10;
 const bulletGenerator = () => {
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
-  if (delta >= 300) {
+  if (delta >= 150) {
     if (bullets.length < maxBulletAmount) {
       bullets.push(
         new GameObjectsComponent(
@@ -81,7 +81,6 @@ const bulletGenerator = () => {
       bullets[index].hit = false;
       bullets[index].x = player.x;
       bullets[index].y = player.y;
-      bullets[index].width = 7;
       index++;
     }
     pastTime = currentTime;
@@ -93,7 +92,7 @@ requestAnimationFrame(bulletGenerator);
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
     if (!bullets[i].hit) bullets[i].movement(0, -5);
-    bullets[i].update();
+    !bullets[i].hit && bullets[i].update();
   }
 };
 
