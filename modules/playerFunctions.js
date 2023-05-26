@@ -2,7 +2,7 @@ import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { keys } from "./inputController.js";
 import { touchLocation, isTouchDevice } from "./inputController.js";
 
-export const player = new GameObjectsComponent(40, 40, "player.png", 175, 400);
+export const player = new GameObjectsComponent(40, 40, "player.png", 175, 500);
 
 const playerSpeed = 2;
 let playerSpeedX;
@@ -13,9 +13,10 @@ const touchController = () => {
   if(!touchX && !touchY) {
     touchX = player.x
     touchY = player.y
+  } else {
+    player.x = touchX;
+    player.y = touchY - 40;
   }
-  player.x = touchX;
-  player.y = touchY;
 }
 
 const movement = () => {

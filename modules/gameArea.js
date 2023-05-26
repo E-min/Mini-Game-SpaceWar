@@ -2,15 +2,16 @@ import { enemiesFunctions } from "./enemyFunctions.js";
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { playerFunctions } from "./playerFunctions.js";
 
+const canvas = document.getElementById('canvas');
+canvas.height = 600;
+canvas.width = 350;
+
 export const gameArea = {
   canvas: document.getElementById('canvas'),
   fps: 60,
   miliseconds: Date.now(),
   start: function () {
-    this.canvas.height = 500;
-    this.canvas.width = 350;
     this.context = this.canvas.getContext("2d");
-    // document.body.prepend(this.canvas);
     let previousTime = this.miliseconds;
     const frameRefresher = () => {
       const currentTime = Date.now();
@@ -27,19 +28,20 @@ export const gameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
 };
+
 const backgroundFirst = new GameObjectsComponent(
-  500,
-  350,
+  canvas.height,
+  canvas.width,
   "background-repeat-1.png",
-  175,
-  -250
+  canvas.width / 2,
+  -canvas.height / 2
 );
 const backgroundSecond = new GameObjectsComponent(
-  500,
-  350,
+  canvas.height,
+  canvas.width,
   "background-repeat-2.png",
-  175,
-  250
+  canvas.width / 2,
+  canvas.height / 2
 );
 // place functions that renders in game
 export const updateGameArea = () => {
@@ -54,10 +56,10 @@ const backgroundRepeat = () => {
   backgroundFirst.update();
   backgroundFirst.angle = 90;
   backgroundSecond.angle = 90;
-  backgroundFirst.movement(0, 1);
-  backgroundSecond.movement(0, 1);
-  backgroundFirst.y > 750 &&
-    ((backgroundFirst.y = -240), (backgroundFirst.angle += 90));
-  backgroundSecond.y > 750 &&
-    ((backgroundSecond.y = -240), (backgroundSecond.angle -= 90));
+  backgroundFirst.movement(0, 5);
+  backgroundSecond.movement(0, 5);
+  backgroundFirst.y >= canvas.height + (canvas.height / 2) &&
+    ((backgroundFirst.y = -canvas.height / 2), (backgroundFirst.angle += 90));
+  backgroundSecond.y >= canvas.height + (canvas.height / 2) &&
+    ((backgroundSecond.y = -canvas.height / 2), (backgroundSecond.angle -= 90));
 };
