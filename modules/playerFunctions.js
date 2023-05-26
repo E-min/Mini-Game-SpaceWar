@@ -1,5 +1,6 @@
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { keys } from "./inputController.js";
+import { touchLocation, isTouchDevice } from "./inputController.js";
 
 export const player = new GameObjectsComponent(40, 40, "player.png", 175, 400);
 
@@ -7,7 +8,18 @@ const playerSpeed = 2;
 let playerSpeedX;
 let playerSpeedY;
 
+const touchController = () => {
+  let {touchX, touchY} = touchLocation;
+  if(!touchX && !touchY) {
+    touchX = player.x
+    touchY = player.y
+  }
+  player.x = touchX;
+  player.y = touchY;
+}
+
 const movement = () => {
+  isTouchDevice && touchController()
   const right = keys.rightKeyPressed;
   const left = keys.leftKeyPressed;
   const up = keys.upKeyPressed;
@@ -32,9 +44,9 @@ const movement = () => {
 };
 
 export const evade = (direction) => {
-  animate(direction);
+  animateEvade(direction);
 };
-const animate = (direction) => {
+const animateEvade = (direction) => {
   let travelRange;
   if (direction === "right") {
     travelRange = 5;
@@ -57,9 +69,11 @@ const animate = (direction) => {
 export const bullets = [];
 let pastTime = Date.now();
 let index = 0;
-const maxBulletAmount = 10;
+const maxBulletAmount = 12;
 
 const bulletGenerator = () => {
+  const smallBulletSpawnX = player.x;
+  const smallBulletSpawnY = player.y - 20;
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
   if (delta >= 150) {
@@ -69,8 +83,8 @@ const bulletGenerator = () => {
           7,
           20,
           "small-red-bullet.png",
-          player.x,
-          player.y
+          smallBulletSpawnX,
+          smallBulletSpawnY
         )
       );
     }
@@ -79,8 +93,8 @@ const bulletGenerator = () => {
     }
     if (bullets.length === maxBulletAmount) {
       bullets[index].hit = false;
-      bullets[index].x = player.x;
-      bullets[index].y = player.y;
+      bullets[index].x = smallBulletSpawnX;
+      bullets[index].y = smallBulletSpawnY;
       index++;
     }
     pastTime = currentTime;
@@ -91,7 +105,7 @@ requestAnimationFrame(bulletGenerator);
 
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
-    if (!bullets[i].hit) bullets[i].movement(0, -5);
+    if (!bullets[i].hit) bullets[i].movement(0, -8);
     !bullets[i].hit && bullets[i].update();
   }
 };

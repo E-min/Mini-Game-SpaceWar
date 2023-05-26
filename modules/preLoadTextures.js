@@ -9,6 +9,7 @@ export const preloadTextures = function(callback) {
     "./textures/background-repeat-2.png",
     "./textures/small-red-bullet.png",
     "./textures/enemy-mini-drone.png",
+    "./textures/enemy-mini-drone-hit.png",
     "./textures/expolision-frame-1.png",
     "./textures/expolision-frame-2.png",
     "./textures/expolision-frame-3.png",

@@ -1,4 +1,8 @@
 import { evade } from "./playerFunctions.js";
+export const isTouchDevice =
+  "ontouchstart" in window ||
+  navigator.maxTouchPoints > 0 ||
+  navigator.msMaxTouchPoints > 0;
 
 // const buttons = document.querySelectorAll(".buttons");
 export const keys = {
@@ -7,38 +11,58 @@ export const keys = {
   upKeyPressed: false,
   downKeyPressed: false,
 };
+export const touchLocation = {
+  touchX: 0,
+  touchY: 0,
+};
+
+//*******************************Touch Cordinates*******************************
+// Get the canvas element
+const canvas = document.getElementById("canvas");
+
+// Variables to store touch coordinates
+let touchX, touchY;
+
+// Touch start event handler
+const handleTouchStart = function (event) {
+  event.preventDefault();
+  const touch = event.touches[0];
+  touchX = touch.clientX - canvas.offsetLeft;
+  touchY = touch.clientY - canvas.offsetTop;
+};
+
+// Touch move event handler
+const handleTouchMove = function (event) {
+  event.preventDefault();
+  const touch = event.touches[0];
+  touchX = touch.clientX - canvas.offsetLeft;
+  touchY = touch.clientY - canvas.offsetTop;
+};
+
+// Touch end event handler
+const handleTouchEnd = function (event) {
+  event.preventDefault();
+  const touch = event.changedTouches[0];
+  touchX = touch.clientX - canvas.offsetLeft;
+  touchY = touch.clientY - canvas.offsetTop;
+};
+// Add touch event listeners to the canvas
+canvas.addEventListener("touchstart", handleTouchStart, false);
+canvas.addEventListener("touchmove", handleTouchMove, false);
+canvas.addEventListener("touchend", handleTouchEnd, false);
+
+// Function to continuously read touch coordinates
+const readTouchCoordinates = function () {
+  touchLocation.touchX = touchX ? touchX : 0;
+  touchLocation.touchY = touchY ? touchY : 0;
+  // Request the next animation frame
+  requestAnimationFrame(readTouchCoordinates);
+};
+// Start reading touch coordinates
+isTouchDevice && readTouchCoordinates();
+//*******************************************************************************
 
 const keyPress = () => {
-  //******************************************
-  // event listener for on secreen buttons
-  //   buttons.forEach((button) => {
-  //     button.addEventListener("touchstart", (event) => {
-  //       switch (event.target.value) {
-  //         case "right":
-  //           event.preventDefault();
-  //           keys.rightKeyPressed = true;
-  //           break;
-  //         case "left":
-  //           event.preventDefault();
-  //           keys.leftKeyPressed = true;
-  //           break;
-  //         case "rotate":
-  //           keys.upKeyPressed = true;
-  //           break;
-  //         case "faster":
-  //           keys.downKeyPressed = true;
-  //           break;
-  //       }
-  //     });
-  //     button.addEventListener("touchend", (event) => {
-  //       switch (event.target.value) {
-  //         case "faster":
-  //           keys.downKeyPressed = false;
-  //           break;
-  //       }
-  //     });
-  //   });
-  
   //******************************************
   // event listener for keyboard keys
   document.addEventListener("keydown", function (event) {
@@ -87,19 +111,19 @@ let firstKeyCycleLeftTime = 0;
 let firstKeyCycleRightTime = 0;
 
 const doubleTapRight = () => {
-    if (keyCycleRight === 0) {
-      keyCycleRight = 1;
-      firstKeyCycleRightTime = Date.now();
-    } else if (keyCycleRight === 1) {
-      const currentTime = Date.now();
-      if (currentTime - firstKeyCycleRightTime < 300) {
-        keyCycleRight = 0;
-        evade('right');
-      } else {
-        firstKeyCycleRightTime = currentTime;
-      }
+  if (keyCycleRight === 0) {
+    keyCycleRight = 1;
+    firstKeyCycleRightTime = Date.now();
+  } else if (keyCycleRight === 1) {
+    const currentTime = Date.now();
+    if (currentTime - firstKeyCycleRightTime < 300) {
+      keyCycleRight = 0;
+      evade("right");
+    } else {
+      firstKeyCycleRightTime = currentTime;
     }
-  };
+  }
+};
 
 const doubleTapLeft = () => {
   if (keyCycleLeft === 0) {
@@ -109,7 +133,7 @@ const doubleTapLeft = () => {
     const currentTime = Date.now();
     if (currentTime - firstKeyCycleLeftTime < 300) {
       keyCycleLeft = 0;
-      evade('left');
+      evade("left");
     } else {
       firstKeyCycleLeftTime = currentTime;
     }

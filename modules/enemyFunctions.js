@@ -2,13 +2,15 @@ import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { bullets } from "./playerFunctions.js";
 
 class EnemiesComponent extends GameObjectsComponent {
-  constructor(width, height, textureName, x, y) {
+  constructor(x, y, width, height, textureName, health) {
     super();
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
     this.textureName = textureName;
+    this.mainTexture = this.textureName.slice(0, -4)
+    this.health = health;
     this.angle = 0;
     this.destroyed = false;
     this.animationTime = 300;
@@ -44,6 +46,7 @@ class EnemiesComponent extends GameObjectsComponent {
   }
   //*******************************************************************
   damageDetect(causeOfObjects) {
+    const mainTexture = this.mainTexture;
     const frontFace = this.y + this.height / 2;
     const backFace = this.y - this.height / 2;
     const right = this.x + this.width / 2;
@@ -57,7 +60,19 @@ class EnemiesComponent extends GameObjectsComponent {
         causeOfObjects[i].x < right &&
         causeOfObjects[i].x > left
       ) {
-        this.expolision();
+        this.textureName = `${mainTexture}-hit.png`;
+        const loadMainTexture = setTimeout(() => {
+          if (this.destroyed) {
+            clearTimeout(loadMainTexture);
+          } else {
+            this.textureName = `${mainTexture}.png`;
+            this.y += 1;
+          }
+        }, 100);
+        
+        this.health--;
+        if (this.health <= 0) this.expolision();
+        this.y -= 3;
         causeOfObjects[i].hit = true;
       }
     }
@@ -90,15 +105,15 @@ class EnemiesComponent extends GameObjectsComponent {
         const finishX = orders[currentOrderIndex].finishX;
         const finishY = orders[currentOrderIndex].finishY;
         const motionType = orders[currentOrderIndex].motionType;
-        // angle calculation
-        const deltaX = finishX - startX;
-        const deltaY = finishY - startY;
-        const angleInRadians = Math.atan2(deltaY, deltaX);
-        const angleInDegrees = (angleInRadians * 180) / Math.PI;
-        // Ensure the angle is within the range of 0 to 360 degrees
-        const normalizedAngle = (angleInDegrees + 360) % 360;
-        this.angle = normalizedAngle + 180; // extra angle add to get frontface
-        //******************
+        // // angle calculation
+        // const deltaX = finishX - startX;
+        // const deltaY = finishY - startY;
+        // const angleInRadians = Math.atan2(deltaY, deltaX);
+        // const angleInDegrees = (angleInRadians * 180) / Math.PI;
+        // // Ensure the angle is within the range of 0 to 360 degrees
+        // const normalizedAngle = (angleInDegrees + 360) % 360;
+        // this.angle = normalizedAngle + 180; // extra angle add to get frontface
+        // //******************
         if (motionType === "straight") {
           velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
           velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
@@ -131,11 +146,12 @@ const enemySpawnPoint = {
 };
 for (let i = 0; i < 10; i++) {
   const enemyDrone = new EnemiesComponent(
+    enemySpawnPoint.x,
+    enemySpawnPoint.y,
     20,
     20,
     "enemy-mini-drone.png",
-    enemySpawnPoint.x,
-    enemySpawnPoint.y
+    5
   );
   enemyDrones.push(enemyDrone);
 }
@@ -156,11 +172,16 @@ const gridTable = (...orders) => {
       x: enemySpawnPoint.x,
       y: enemySpawnPoint.y,
     };
-    const words = "ABCDEFGHI";
+    const words = "XABCDEFGHIJK";
     const gridwidth = 35;
     for (let i = 0; i < orders[enemyIndex].length; i++) {
-      const xAxis = (words.indexOf(orders[enemyIndex][i][0]) + 1) * gridwidth;
-      const yAxis = orders[enemyIndex][i][1] * gridwidth;
+      const firstLetter = orders[enemyIndex][i][0];
+      const SecondNumber = orders[enemyIndex][i][1];
+      const xAxis =
+          firstLetter === "X"
+          ? -2 * gridwidth
+          : words.indexOf(firstLetter) * gridwidth;
+      const yAxis = SecondNumber * gridwidth;
       const moveSet = {
         startX: enemyStartPoint.x,
         startY: enemyStartPoint.y,
@@ -186,15 +207,15 @@ const gridTable = (...orders) => {
 };
 //********************************************************************
 gridTable(
-  ["A1", "A5"],
-  ["A1", "B4"],
-  ["A1", "C3"],
-  ["A1", "D2"],
-  ["E0", "E1"],
-  ["H1", "F2"],
-  ["H1", "G3"],
-  ["H1", "H4"],
-  ["H1", "I5"]
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
 );
 
 const renderEnemies = () => {
