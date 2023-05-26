@@ -15,7 +15,7 @@ const touchController = () => {
     touchY = player.y
   } else {
     player.x = touchX;
-    player.y = touchY - 40;
+    player.y = touchY - 80;
   }
 }
 
