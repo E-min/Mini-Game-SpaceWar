@@ -9,12 +9,14 @@ export const preloadTextures = function(callback) {
     "./textures/background-repeat-2.png",
     "./textures/small-red-bullet.png",
     "./textures/enemy-mini-drone.png",
+    "./textures/enemy-mini-ship.png",
+    "./textures/enemy-mini-ship-hit.png",
     "./textures/enemy-mini-drone-hit.png",
-    "./textures/expolision-frame-1.png",
-    "./textures/expolision-frame-2.png",
-    "./textures/expolision-frame-3.png",
-    "./textures/expolision-frame-4.png",
-    "./textures/expolision-frame-5.png",
+    "./textures/exploison-frame-1.png",
+    "./textures/exploison-frame-2.png",
+    "./textures/exploison-frame-3.png",
+    "./textures/exploison-frame-4.png",
+    "./textures/exploison-frame-5.png", 
   ];
   // Counter to keep track of the loaded texture images
   let loadedCount = 0;

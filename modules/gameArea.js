@@ -2,7 +2,7 @@ import { enemiesFunctions } from "./enemyFunctions.js";
 import { GameObjectsComponent } from "./gameObjectsComponent.js";
 import { playerFunctions } from "./playerFunctions.js";
 
-const canvas = document.getElementById('canvas');
+export const canvas = document.getElementById('canvas');
 canvas.height = 600;
 canvas.width = 350;
 

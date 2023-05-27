@@ -9,7 +9,7 @@ class EnemiesComponent extends GameObjectsComponent {
     this.x = x;
     this.y = y;
     this.textureName = textureName;
-    this.mainTexture = this.textureName.slice(0, -4)
+    this.mainTexture = this.textureName.slice(0, -4);
     this.health = health;
     this.angle = 0;
     this.destroyed = false;
@@ -22,10 +22,12 @@ class EnemiesComponent extends GameObjectsComponent {
     }
   }
   //*******************************************************************
-  expolision() {
+  exploison() {
     let startExpolision = Date.now();
     this.destroyed = true;
     let animateFrames = 1;
+    const objectWidth = this.width;
+    const objectHeight = this.height;
     const update = () => {
       const currentTime = Date.now();
       const delta = currentTime - startExpolision;
@@ -33,10 +35,10 @@ class EnemiesComponent extends GameObjectsComponent {
         return;
       }
       if (delta >= this.animationTime / 5) {
-        this.width = 30;
-        this.height = 30;
+        this.width = objectWidth + 5;
+        this.height = objectHeight + 5;
         this.angle = 0;
-        this.textureName = `expolision-frame-${animateFrames}.png`;
+        this.textureName = `exploison-frame-${animateFrames}.png`;
         animateFrames++;
         startExpolision = currentTime;
       }
@@ -44,6 +46,7 @@ class EnemiesComponent extends GameObjectsComponent {
     };
     requestAnimationFrame(update);
   }
+
   //*******************************************************************
   damageDetect(causeOfObjects) {
     const mainTexture = this.mainTexture;
@@ -66,13 +69,13 @@ class EnemiesComponent extends GameObjectsComponent {
             clearTimeout(loadMainTexture);
           } else {
             this.textureName = `${mainTexture}.png`;
-            this.y += 1;
+            this.movement(0, 1);
           }
         }, 100);
-        
+
         this.health--;
-        if (this.health <= 0) this.expolision();
-        this.y -= 3;
+        if (this.health <= 0) this.exploison();
+        this.movement(0, -3);
         causeOfObjects[i].hit = true;
       }
     }
@@ -92,7 +95,7 @@ class EnemiesComponent extends GameObjectsComponent {
 
         if (animateFrames === totalFramesOnEachAnimationSet) {
           currentOrderIndex++; // Move to the next order
-          if (currentOrderIndex < orders.length) {
+          if (currentOrderIndex < orders.length && !this.destroyed) {
             // If there are more orders, animate the next one
             animateOrder();
           }
@@ -105,15 +108,6 @@ class EnemiesComponent extends GameObjectsComponent {
         const finishX = orders[currentOrderIndex].finishX;
         const finishY = orders[currentOrderIndex].finishY;
         const motionType = orders[currentOrderIndex].motionType;
-        // // angle calculation
-        // const deltaX = finishX - startX;
-        // const deltaY = finishY - startY;
-        // const angleInRadians = Math.atan2(deltaY, deltaX);
-        // const angleInDegrees = (angleInRadians * 180) / Math.PI;
-        // // Ensure the angle is within the range of 0 to 360 degrees
-        // const normalizedAngle = (angleInDegrees + 360) % 360;
-        // this.angle = normalizedAngle + 180; // extra angle add to get frontface
-        // //******************
         if (motionType === "straight") {
           velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
           velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
@@ -123,7 +117,7 @@ class EnemiesComponent extends GameObjectsComponent {
           this.y = startY;
         }
         if (delta >= 1000 / 60) {
-          this.movement(velocityX, velocityY);
+           this.movement(velocityX, velocityY);
           animateFrames++;
           lastTime = currentTime;
         }
@@ -148,15 +142,37 @@ for (let i = 0; i < 10; i++) {
   const enemyDrone = new EnemiesComponent(
     enemySpawnPoint.x,
     enemySpawnPoint.y,
-    20,
-    20,
-    "enemy-mini-drone.png",
+    40,
+    40,
+    "enemy-mini-ship.png",
     5
   );
   enemyDrones.push(enemyDrone);
 }
 //*********************************************************************
 //***********************enemy formations******************************
+const firstEnemyTeamFormations = [
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
+];
+const secondEnemeyTeamFormations = [
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+  ["A1", "A3", "C3", "E3", "F3", "H3", "J3", "J5", "H5", "F5", "X1"],
+];
 const gridTable = (...orders) => {
   let lastTime = Date.now();
   let enemyIndex = 0;
@@ -178,7 +194,7 @@ const gridTable = (...orders) => {
       const firstLetter = orders[enemyIndex][i][0];
       const SecondNumber = orders[enemyIndex][i][1];
       const xAxis =
-          firstLetter === "X"
+        firstLetter === "X"
           ? -2 * gridwidth
           : words.indexOf(firstLetter) * gridwidth;
       const yAxis = SecondNumber * gridwidth;
@@ -205,22 +221,14 @@ const gridTable = (...orders) => {
   };
   requestAnimationFrame(update);
 };
+gridTable(...firstEnemyTeamFormations);
 //********************************************************************
-gridTable(
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-);
 
 const renderEnemies = () => {
+  let destroyedCount = 0;
   for (let i = enemyDrones.length - 1; i >= 0; i--) {
     if (!enemyDrones[i]) {
+      destroyedCount++;
       continue;
     }
     enemyDrones[i].update();
@@ -232,7 +240,6 @@ const renderEnemies = () => {
       }, animationDuration + extraTimeForLastFrame);
       continue;
     }
-    enemyDrones[i].angle = 270;
     enemyDrones[i].damageDetect(bullets);
   }
 };
