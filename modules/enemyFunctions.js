@@ -1,74 +1,47 @@
-import { EnemiesComponent } from "./gameObjectsComponent.js";
-import { bullets } from "./playerFunctions.js";
+import { EnemiesComponent } from './gameObjectsComponent.js';
+import { bullets } from './playerFunctions.js';
+
 
 //***********************enemy formations******************************
 const enemeyPaths = [
-  ["A1", "C1", "E1", "G1", "I1", "I3", "G3", "E3", "C3", "A3", "X1"],
-  [
-    "A2",
-    "C2",
-    "E2",
-    "E4",
-    "E6",
-    "D7",
-    "B7",
-    "A6",
-    "A4",
-    "B3",
-    "F3",
-    "I3",
-    "K1",
-  ],
-  [
-    "I2",
-    "G2",
-    "E2",
-    "E4",
-    "E6",
-    "F7",
-    "H7",
-    "I6",
-    "I4",
-    "H3",
-    "D3",
-    "A3",
-    "X1",
-  ],
-  ["E1", "C1", "C3", "C5", "C5", "C5", "C5", "A3", "X1"],
-  ["E1", "G1", "G3", "G5", "G5", "G5", "G5", "I3", "K1"],
+  ['A1', 'C1', 'E1', 'G1', 'I1', 'I3', 'G3', 'E3', 'C3', 'A3', 'X1'],
+  ['A2', 'C2', 'E2', 'E4', 'E6', 'D7', 'B7', 'A6', 'A4', 'B3', 'F3', 'I3', 'K1'],
+  ['I2', 'G2', 'E2', 'E4', 'E6', 'F7', 'H7', 'I6', 'I4', 'H3', 'D3', 'A3', 'X1'],
+  ['E1', 'C1', 'C3', 'C5', 'C5', 'C5', 'C5', 'A3', 'X1'],
+  ['E1', 'G1', 'G3', 'G5', 'G5', 'G5', 'G5', 'I3', 'K1'],
 ];
 const enemyTeamsAppearingSequence = [
   [
-    ["mini-drone", 2],
-    ["mini-drone", 1],
-    ["mini-drone", 2],
-    ["mini-drone", 2],
-    ["mini-ship", 3],
-    ["mini-ship", 4],
+    ['mini-drone', 2],
+    ['mini-drone', 1],
+    ['mini-drone', 2],
+    ['mini-drone', 2],
+    ['mini-ship', 3],
+    ['mini-ship', 4],
   ],
   [
-    ["mini-ship", 3],
-    ["mini-ship", 4],
-    ["mini-drone", 1],
-    ["mini-drone", 1],
-    ["mini-drone", 2],
-    ["mini-ship", 3],
-    ["mini-ship", 4],
-    ["mini-drone", 1],
-    ["mini-drone", 1],
-    ["mini-drone", 2],
+    ['mini-ship', 3],
+    ['mini-ship', 4],
+    ['mini-drone', 1],
+    ['mini-drone', 1],
+    ['mini-drone', 2],
+    ['mini-ship', 3],
+    ['mini-ship', 4],
+    ['mini-drone', 1],
+    ['mini-drone', 1],
+    ['mini-drone', 2],
   ],
   [
-    ["mini-ship", 3],
-    ["mini-ship", 4],
-    ["mini-ship", 1],
-    ["mini-ship", 2],
-    ["mini-ship", 1],
-    ["mini-ship", 2],
-    ["mini-ship", 1],
-    ["mini-ship", 2],
-    ["mini-ship", 1],
-    ["mini-ship", 2],
+    ['mini-ship', 3],
+    ['mini-ship', 4],
+    ['mini-ship', 1],
+    ['mini-ship', 2],
+    ['mini-ship', 1],
+    ['mini-ship', 2],
+    ['mini-ship', 1],
+    ['mini-ship', 2],
+    ['mini-ship', 1],
+    ['mini-ship', 2],
   ],
 ];
 //*********************************************************************
@@ -89,22 +62,19 @@ const gridTable = (...orders) => {
       x: enemySpawnPoint.x,
       y: enemySpawnPoint.y,
     };
-    const words = "XABCDEFGHIJK";
+    const words = 'XABCDEFGHIJK';
     const gridwidth = 35;
     for (let i = 0; i < orders[enemyIndex].length; i++) {
       const firstLetter = orders[enemyIndex][i][0];
       const SecondNumber = orders[enemyIndex][i][1];
-      const xAxis =
-        firstLetter === "X"
-          ? -2 * gridwidth
-          : words.indexOf(firstLetter) * gridwidth;
+      const xAxis = firstLetter === 'X' ? -2 * gridwidth : words.indexOf(firstLetter) * gridwidth;
       const yAxis = SecondNumber * gridwidth;
       const moveSet = {
         startX: enemyStartPoint.x,
         startY: enemyStartPoint.y,
         finishX: xAxis,
         finishY: yAxis,
-        motionType: "straight",
+        motionType: 'straight',
       };
       moveSets.push(moveSet);
       enemyStartPoint.x = xAxis;
@@ -136,7 +106,7 @@ let isAllDestroyed = false;
 let enemySequence = 0;
 let timerId; // Variable to store the timer ID
 
-const sequenceTimeLimits = [20000, 20000, 20000];
+const sequenceTimeLimits = [20000, 25000, 20000];
 
 const createNewEnemies = (sequence) => {
   // Clear the previous timer if it exists
@@ -152,22 +122,19 @@ const createNewEnemies = (sequence) => {
   isAllDestroyed = false;
   sequenceEnded = false;
   //**********************
-  let health;
-  let width;
-  let height;
   for (let i = 0; i < sequence.length; i++) {
     const enemyType = sequence[i][0];
     const pathIndex = sequence[i][1];
 
     let health, width, height;
     switch (enemyType) {
-      case "mini-ship":
+      case 'mini-ship':
         health = 7;
         width = 40;
         height = 40;
         break;
-      case "mini-drone":
-        health = 3;
+      case 'mini-drone':
+        health = 4;
         width = 20;
         height = 20;
         break;
@@ -183,11 +150,10 @@ const createNewEnemies = (sequence) => {
     currentEnemies.push(newEnemy);
     currentEnemyFormations.push(enemeyPaths[pathIndex]);
   }
-
   gridTable(...currentEnemyFormations);
   enemySequence++;
 };
-// start sequence
+// first start sequence
 createNewEnemies(enemyTeamsAppearingSequence[0], 0);
 //*********************************************************************
 
@@ -209,10 +175,7 @@ const renderEnemies = () => {
       currentEnemy.damageDetect(bullets);
     }
   }
-  if (
-    destroyedCount === currentEnemyAmount &&
-    isAllAnimationFinished === currentEnemyAmount
-  ) {
+  if (destroyedCount === currentEnemyAmount && isAllAnimationFinished === currentEnemyAmount) {
     isAllDestroyed = true;
   }
   //****spwap defeated or timeouted enemys with new ones****

@@ -1,4 +1,5 @@
 import { gameArea } from "./gameArea.js";
+import { soundEffects } from "./gameSoundEffects.js";
 import { textureImages } from "./preLoadTextures.js";
 
 export class GameObjectsComponent {
@@ -48,7 +49,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     this.health = health;
     this.angle = 0;
     this.destroyed = false;
-    this.animationTime = 300;
+    this.explosionDuration = 500;
   }
   movement(moveX, moveY) {
     if (!this.destroyed) {
@@ -63,6 +64,13 @@ export class EnemiesComponent extends GameObjectsComponent {
     let animateFrames = 1;
     const objectWidth = this.width;
     const objectHeight = this.height;
+    const randomExploison = Math.floor(Math.random() * 3)
+    const exploisonSound = soundEffects[`exploison${randomExploison}`];
+    if (!exploisonSound.paused) {
+      exploisonSound.pause();
+      exploisonSound.currentTime = 0;
+    }
+    exploisonSound.play();
     const update = () => {
       const currentTime = Date.now();
       const delta = currentTime - startExpolision;
@@ -70,9 +78,9 @@ export class EnemiesComponent extends GameObjectsComponent {
         this.animationFinished = true;
         return;
       }
-      if (delta >= this.animationTime / 5) {
-        this.width = objectWidth + 5;
-        this.height = objectHeight + 5;
+      if (delta >= this.explosionDuration / 5) {
+        this.width = objectWidth + 10;
+        this.height = objectHeight + 10;
         this.angle = 0;
         this.textureName = `exploison-frame-${animateFrames}.png`;
         animateFrames++;
@@ -91,7 +99,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     const right = this.x + this.width / 2;
     const left = this.x - this.width / 2;
     for (let i = 0; i < causeOfObjects.length; i++) {
-      // if bullet did hit pass the collision check
+      // if bullet did hit, pass the collision check
       if (causeOfObjects[i].hit) continue;
       if (
         causeOfObjects[i].y < frontFace &&
@@ -101,7 +109,7 @@ export class EnemiesComponent extends GameObjectsComponent {
       ) {
         this.textureName = `${mainTexture}-hit.png`;
         const loadMainTexture = setTimeout(() => {
-          if (this.destroyed) {
+          if (this.destroyed || this.health === 1) {
             clearTimeout(loadMainTexture);
           } else {
             this.textureName = `${mainTexture}.png`;

@@ -1,26 +1,27 @@
-import { GameObjectsComponent } from "./gameObjectsComponent.js";
-import { keys } from "./inputController.js";
-import { touchLocation, isTouchDevice } from "./inputController.js";
+import { GameObjectsComponent } from './gameObjectsComponent.js';
+import { soundEffects } from './gameSoundEffects.js';
+import { keys } from './inputController.js';
+import { touchLocation, isTouchDevice } from './inputController.js';
 
-export const player = new GameObjectsComponent(40, 40, "player.png", 175, 500);
+export const player = new GameObjectsComponent(40, 40, 'player.png', 175, 500);
 
 const playerSpeed = 2;
 let playerSpeedX;
 let playerSpeedY;
 
 const touchController = () => {
-  let {touchX, touchY} = touchLocation;
-  if(!touchX && !touchY) {
-    touchX = player.x
-    touchY = player.y
+  let { touchX, touchY } = touchLocation;
+  if (!touchX && !touchY) {
+    touchX = player.x;
+    touchY = player.y;
   } else {
     player.x = touchX;
     player.y = touchY - 80;
   }
-}
+};
 
 const movement = () => {
-  isTouchDevice && touchController()
+  isTouchDevice && touchController();
   const right = keys.rightKeyPressed;
   const left = keys.leftKeyPressed;
   const up = keys.upKeyPressed;
@@ -49,7 +50,7 @@ export const evade = (direction) => {
 };
 const animateEvade = (direction) => {
   let travelRange;
-  if (direction === "right") {
+  if (direction === 'right') {
     travelRange = 5;
   } else {
     travelRange = -5;
@@ -83,7 +84,7 @@ const bulletGenerator = () => {
         new GameObjectsComponent(
           7,
           20,
-          "small-red-bullet.png",
+          'small-red-bullet.png',
           smallBulletSpawnX,
           smallBulletSpawnY
         )
@@ -104,10 +105,15 @@ const bulletGenerator = () => {
 };
 requestAnimationFrame(bulletGenerator);
 
+const laserSound = soundEffects.laserShoot;
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
-    if (!bullets[i].hit) bullets[i].movement(0, -8);
-    !bullets[i].hit && bullets[i].update();
+    const bullet = bullets[i];
+    if (!bullet.hit) {
+      i % 2 && laserSound.play();
+      bullet.movement(0, -8);
+      bullet.update();
+    }
   }
 };
 
