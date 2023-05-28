@@ -1,13 +1,8 @@
 import { GameObjectsComponent } from './gameObjectsComponent.js';
-import { soundEffects } from './gameSoundEffects.js';
-import { keys } from './inputController.js';
+import { mouseLocation } from './inputController.js';
 import { touchLocation, isTouchDevice } from './inputController.js';
 
 export const player = new GameObjectsComponent(40, 40, 'player.png', 175, 500);
-
-const playerSpeed = 2;
-let playerSpeedX;
-let playerSpeedY;
 
 const touchController = () => {
   let { touchX, touchY } = touchLocation;
@@ -19,71 +14,33 @@ const touchController = () => {
     player.y = touchY - 80;
   }
 };
-
-const movement = () => {
-  isTouchDevice && touchController();
-  const right = keys.rightKeyPressed;
-  const left = keys.leftKeyPressed;
-  const up = keys.upKeyPressed;
-  const down = keys.downKeyPressed;
-  if (up) {
-    playerSpeedY = -playerSpeed;
-  } else if (down) {
-    playerSpeedY = playerSpeed;
+const mouseController = () => {
+  let { x, y } = mouseLocation;
+  if (!x && !y) {
+    x = player.x;
+    y = player.y;
   } else {
-    playerSpeedY = 0;
+    player.x = x;
+    player.y = y;
   }
-  if (left && !right) {
-    playerSpeedX = -playerSpeed;
-  }
-  if (right && !left) {
-    playerSpeedX = playerSpeed;
-  }
-  if (!right && !left) {
-    playerSpeedX = 0;
-  }
-  player.movement(playerSpeedX, playerSpeedY);
-};
-
-export const evade = (direction) => {
-  animateEvade(direction);
-};
-const animateEvade = (direction) => {
-  let travelRange;
-  if (direction === 'right') {
-    travelRange = 5;
-  } else {
-    travelRange = -5;
-  }
-  const duration = 200;
-  const startAnimate = Date.now();
-  const update = () => {
-    const currentTime = Date.now();
-    const elapsed = currentTime - startAnimate;
-    player.movement(travelRange, playerSpeedY);
-    if (elapsed < duration) {
-      requestAnimationFrame(update);
-    }
-  };
-  requestAnimationFrame(update);
 };
 
 export const bullets = [];
 let pastTime = Date.now();
 let index = 0;
-let maxBulletAmount = 10;
+let maxBulletAmount;
 
 const bulletGenerator = () => {
   const smallBulletSpawnX = player.x;
   const smallBulletSpawnY = player.y - 20;
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
-  if (delta >= 150) {
-    if (touchLocation.onTouch) {
-      maxBulletAmount = 10;
-    } else {
-      maxBulletAmount = 0;
-    }
+  if (touchLocation.onTouch || mouseLocation.leftClick) {
+    maxBulletAmount = 5;
+  } else {
+    maxBulletAmount = 0;
+  }
+  if (delta >= 200) {
     if (bullets.length < maxBulletAmount) {
       bullets.push(
         new GameObjectsComponent(
@@ -110,21 +67,19 @@ const bulletGenerator = () => {
 };
 requestAnimationFrame(bulletGenerator);
 
-const laserSound = soundEffects.laserShoot;
-laserSound.volume = 0.1;
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
     const bullet = bullets[i];
-    touchLocation.onTouch && laserSound.play();
     if (!bullet.hit) {
-      bullet.movement(0, -8);
+      bullet.movement(0, -10);
       bullet.update();
     }
   }
 };
 
 export const playerFunctions = () => {
-  movement();
+  mouseController();
+  isTouchDevice && touchController();
   player.update();
   renderBullets();
 };
