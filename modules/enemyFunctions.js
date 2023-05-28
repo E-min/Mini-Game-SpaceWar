@@ -1,7 +1,6 @@
 import { EnemiesComponent } from './gameObjectsComponent.js';
 import { bullets } from './playerFunctions.js';
 
-
 //***********************enemy formations******************************
 const enemeyPaths = [
   ['A1', 'C1', 'E1', 'G1', 'I1', 'I3', 'G3', 'E3', 'C3', 'A3', 'X1'],
@@ -106,7 +105,7 @@ let isAllDestroyed = false;
 let enemySequence = 0;
 let timerId; // Variable to store the timer ID
 
-const sequenceTimeLimits = [20000, 25000, 20000];
+const sequenceTimeLimits = [15000, 20000, 23000];
 
 const createNewEnemies = (sequence) => {
   // Clear the previous timer if it exists
@@ -129,12 +128,12 @@ const createNewEnemies = (sequence) => {
     let health, width, height;
     switch (enemyType) {
       case 'mini-ship':
-        health = 7;
+        health = 5;
         width = 40;
         height = 40;
         break;
       case 'mini-drone':
-        health = 4;
+        health = 2;
         width = 20;
         height = 20;
         break;
@@ -151,7 +150,11 @@ const createNewEnemies = (sequence) => {
     currentEnemyFormations.push(enemeyPaths[pathIndex]);
   }
   gridTable(...currentEnemyFormations);
-  enemySequence++;
+  if (enemySequence === enemyTeamsAppearingSequence.length - 1) {
+    enemySequence = 0;
+  } else {
+    enemySequence++;
+  }
 };
 // first start sequence
 createNewEnemies(enemyTeamsAppearingSequence[0], 0);
@@ -183,7 +186,7 @@ const renderEnemies = () => {
     if (timerId) {
       clearTimeout(timerId);
     }
-    createNewEnemies(enemyTeamsAppearingSequence[enemySequence], enemySequence);
+    createNewEnemies(enemyTeamsAppearingSequence[enemySequence]);
   }
   //********************************************************
 };
