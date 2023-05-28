@@ -71,7 +71,7 @@ const animateEvade = (direction) => {
 export const bullets = [];
 let pastTime = Date.now();
 let index = 0;
-const maxBulletAmount = 10;
+let maxBulletAmount = 10;
 
 const bulletGenerator = () => {
   const smallBulletSpawnX = player.x;
@@ -79,6 +79,11 @@ const bulletGenerator = () => {
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
   if (delta >= 150) {
+    if (touchLocation.onTouch) {
+      maxBulletAmount = 10;
+    } else {
+      maxBulletAmount = 0;
+    }
     if (bullets.length < maxBulletAmount) {
       bullets.push(
         new GameObjectsComponent(
@@ -93,7 +98,7 @@ const bulletGenerator = () => {
     if (index === bullets.length) {
       index = 0;
     }
-    if (bullets.length === maxBulletAmount) {
+    if (bullets.length === maxBulletAmount && maxBulletAmount) {
       bullets[index].hit = false;
       bullets[index].x = smallBulletSpawnX;
       bullets[index].y = smallBulletSpawnY;
@@ -106,11 +111,12 @@ const bulletGenerator = () => {
 requestAnimationFrame(bulletGenerator);
 
 const laserSound = soundEffects.laserShoot;
+laserSound.volume = 0.1;
 const renderBullets = () => {
   for (let i = 0; i < bullets.length; i++) {
     const bullet = bullets[i];
+    touchLocation.onTouch && laserSound.play();
     if (!bullet.hit) {
-      i % 2 && laserSound.play();
       bullet.movement(0, -8);
       bullet.update();
     }

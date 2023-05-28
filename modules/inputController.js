@@ -14,6 +14,7 @@ export const keys = {
 export const touchLocation = {
   touchX: 0,
   touchY: 0,
+  onTouch: false
 };
 
 //*******************************Touch Cordinates*******************************
@@ -27,6 +28,7 @@ let touchX, touchY;
 const handleTouchStart = function (event) {
   event.preventDefault();
   const touch = event.touches[0];
+  touchLocation.onTouch = true;
   touchX = touch.clientX - canvas.offsetLeft;
   touchY = touch.clientY - canvas.offsetTop;
 };
@@ -43,6 +45,7 @@ const handleTouchMove = function (event) {
 const handleTouchEnd = function (event) {
   event.preventDefault();
   const touch = event.changedTouches[0];
+  touchLocation.onTouch = false;
   touchX = touch.clientX - canvas.offsetLeft;
   touchY = touch.clientY - canvas.offsetTop;
 };
