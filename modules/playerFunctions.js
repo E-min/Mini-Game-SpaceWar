@@ -70,7 +70,7 @@ const animateEvade = (direction) => {
 export const bullets = [];
 let pastTime = Date.now();
 let index = 0;
-const maxBulletAmount = 12;
+const maxBulletAmount = 10;
 
 const bulletGenerator = () => {
   const smallBulletSpawnX = player.x;
