@@ -49,7 +49,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     this.health = health;
     this.angle = 0;
     this.destroyed = false;
-    this.explosionDuration = 500;
+    this.explosionDuration = 300;
   }
   movement(moveX, moveY) {
     if (!this.destroyed) {
@@ -66,6 +66,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     const objectHeight = this.height;
     const randomExploison = Math.floor(Math.random() * 3)
     const exploisonSound = soundEffects[`exploison${randomExploison}`];
+    exploisonSound.volume = 0.05;
     if (!exploisonSound.paused) {
       exploisonSound.pause();
       exploisonSound.currentTime = 0;
@@ -75,7 +76,10 @@ export class EnemiesComponent extends GameObjectsComponent {
       const currentTime = Date.now();
       const delta = currentTime - startExpolision;
       if (animateFrames === 6) {
-        this.animationFinished = true;
+        // time delay for last frame
+          setTimeout(() => {
+            this.animationFinished = true;
+          }, 100);
         return;
       }
       if (delta >= this.explosionDuration / 5) {
