@@ -17,6 +17,7 @@ export const preloadTextures = function(callback) {
     "./textures/exploison-frame-3.png",
     "./textures/exploison-frame-4.png",
     "./textures/exploison-frame-5.png", 
+    "./textures/green-orb.png", 
   ];
   // Counter to keep track of the loaded texture images
   let loadedCount = 0;
