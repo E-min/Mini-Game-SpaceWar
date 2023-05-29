@@ -1,5 +1,5 @@
 import { EnemiesComponent } from './gameObjectsComponent.js';
-import { bullets } from './playerFunctions.js';
+import { bullets, player } from './playerFunctions.js';
 
 //***********************enemy formations******************************
 const enemeyPaths = [
@@ -125,17 +125,19 @@ const createNewEnemies = (sequence) => {
     const enemyType = sequence[i][0];
     const pathIndex = sequence[i][1];
 
-    let health, width, height;
+    let health, width, height, bulletAmount;
     switch (enemyType) {
       case 'mini-ship':
         health = 5;
         width = 40;
         height = 40;
+        bulletAmount = 10;
         break;
       case 'mini-drone':
         health = 2;
         width = 20;
         height = 20;
+        bulletAmount = 5;
         break;
     }
     const newEnemy = new EnemiesComponent(
@@ -144,7 +146,8 @@ const createNewEnemies = (sequence) => {
       width,
       height,
       `enemy-${enemyType}.png`,
-      health
+      health,
+      bulletAmount
     );
     currentEnemies.push(newEnemy);
     currentEnemyFormations.push(enemeyPaths[pathIndex]);
@@ -167,6 +170,7 @@ const renderEnemies = () => {
   let isAllAnimationFinished = 0;
   for (let i = 0; i < currentEnemyAmount; i++) {
     const currentEnemy = currentEnemies[i];
+    currentEnemy.bulletUpdate(player);
     if (currentEnemy.animationFinished) {
       isAllAnimationFinished++;
     } else {

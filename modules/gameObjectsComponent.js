@@ -1,7 +1,8 @@
-import { gameArea } from "./gameArea.js";
-import { soundEffects } from "./gameSoundEffects.js";
-import { textureImages } from "./preLoadTextures.js";
+import { gameArea } from './gameArea.js';
+import { soundEffects } from './gameSoundEffects.js';
+import { textureImages } from './preLoadTextures.js';
 
+// root of all objects in game******************************************
 export class GameObjectsComponent {
   constructor(width, height, textureName, x, y) {
     this.width = width;
@@ -11,7 +12,6 @@ export class GameObjectsComponent {
     this.textureName = textureName;
     this.angle = 0;
     this.hit = false;
-    this.animationFinished = false;
   }
   update() {
     const context = gameArea.context;
@@ -19,13 +19,7 @@ export class GameObjectsComponent {
     context.save();
     context.translate(this.x, this.y);
     context.rotate((this.angle * Math.PI) / 180);
-    context.drawImage(
-      texture,
-      this.width / -2,
-      this.height / -2,
-      this.width,
-      this.height
-    );
+    context.drawImage(texture, this.width / -2, this.height / -2, this.width, this.height);
     context.restore();
   }
   movement(moveX = 0, moveY = 0) {
@@ -36,8 +30,8 @@ export class GameObjectsComponent {
     this.angle += rotationAngle;
   }
 }
-
-export class EnemiesComponent extends GameObjectsComponent {
+//***************************************************************
+export class Player extends GameObjectsComponent {
   constructor(x, y, width, height, textureName, health) {
     super();
     this.width = width;
@@ -47,24 +41,17 @@ export class EnemiesComponent extends GameObjectsComponent {
     this.textureName = textureName;
     this.mainTexture = this.textureName.slice(0, -4);
     this.health = health;
-    this.angle = 0;
     this.destroyed = false;
-    this.explosionDuration = 300;
+    this.animationFinished = false;
   }
-  movement(moveX, moveY) {
-    if (!this.destroyed) {
-      this.x += moveX;
-      this.y += moveY;
-    }
-  }
-  //*******************************************************************
   exploison() {
-    let startExpolision = Date.now();
+    const explosionDuration = 300;
     this.destroyed = true;
+    let startExpolision = Date.now();
     let animateFrames = 1;
     const objectWidth = this.width;
     const objectHeight = this.height;
-    const randomExploison = Math.floor(Math.random() * 3)
+    const randomExploison = Math.floor(Math.random() * 3);
     const exploisonSound = soundEffects[`exploison${randomExploison}`];
     exploisonSound.volume = 0.05;
     if (!exploisonSound.paused) {
@@ -77,12 +64,132 @@ export class EnemiesComponent extends GameObjectsComponent {
       const delta = currentTime - startExpolision;
       if (animateFrames === 6) {
         // time delay for last frame
-          setTimeout(() => {
-            this.animationFinished = true;
-          }, 100);
+        setTimeout(() => {
+          this.animationFinished = true;
+        }, 100);
         return;
       }
-      if (delta >= this.explosionDuration / 5) {
+      if (delta >= explosionDuration / 5) {
+        this.width = objectWidth + 10;
+        this.height = objectHeight + 10;
+        this.angle = 0;
+        this.textureName = `exploison-frame-${animateFrames}.png`;
+        animateFrames++;
+        startExpolision = currentTime;
+      }
+      requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+}
+// blueprint for All enemies*******************************
+export class EnemiesComponent extends GameObjectsComponent {
+  constructor(x, y, width, height, textureName, health, bulletAmount) {
+    super();
+    this.width = width;
+    this.height = height;
+    this.x = x;
+    this.y = y;
+    this.textureName = textureName;
+    this.mainTexture = this.textureName.slice(0, -4);
+    this.health = health;
+    this.angle = 0;
+    this.destroyed = false;
+    this.animationFinished = false;
+    this.bulletAmount = bulletAmount;
+    this.enemyBullets = [];
+    this.bullets();
+  }
+  bulletUpdate(player) {
+    let playerHit = false;
+    for (let i = 0; i < this.enemyBullets.length; i++) {
+      const bullet = this.enemyBullets[i];
+      if (bullet.hit) {
+        continue;
+      }
+      if (!bullet.hit) {
+        bullet.movement(0, 10);
+        bullet.update();
+      }
+      if (
+        player.y - player.height / 2 <= bullet.y &&
+        player.y + player.height / 2 >= bullet.y &&
+        player.x - player.width / 2 <= bullet.x &&
+        player.x + player.width / 2 >= bullet.x
+      ) {
+        bullet.hit = true;
+        playerHit = true;
+      }
+    }
+    if (playerHit) {
+      player.health--;
+      player.health === 0 && player.exploison();
+      playerHit = false;
+    }
+  }
+  movement(moveX, moveY) {
+    if (!this.destroyed) {
+      this.x += moveX;
+      this.y += moveY;
+    }
+  }
+  bullets() {
+    let lastTime = Date.now();
+    let bulletCycle = 0;
+    let index = 0;
+    const update = () => {
+      const randomBulletDelay = (Math.floor(Math.random() * 5) + 3) * 1000;
+      const currentTime = Date.now();
+      const delta = currentTime - lastTime;
+      if (delta >= randomBulletDelay) {
+        if (this.destroyed) return;
+        if (bulletCycle !== this.bulletAmount - 1) {
+          const newBullet = new GameObjectsComponent(10, 10, 'green-orb.png', this.x, this.y);
+          this.enemyBullets.push(newBullet);
+          bulletCycle++;
+        }
+        if (index === this.bulletAmount - 1) {
+          index = 0;
+        } else {
+          const bullet = this.enemyBullets[index];
+          bullet.hit = false;
+          bullet.x = this.x;
+          bullet.y = this.y;
+          index++;
+        }
+        lastTime = currentTime;
+      }
+      requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+  //******************************************
+  exploison() {
+    const explosionDuration = 300;
+    this.destroyed = true;
+    let startExpolision = Date.now();
+    let animateFrames = 1;
+    const objectWidth = this.width;
+    const objectHeight = this.height;
+    const randomExploison = Math.floor(Math.random() * 3);
+    const exploisonSound = soundEffects[`exploison${randomExploison}`];
+    exploisonSound.volume = 0.05;
+    if (!exploisonSound.paused) {
+      exploisonSound.pause();
+      exploisonSound.currentTime = 0;
+    }
+    exploisonSound.play();
+    const update = () => {
+      const currentTime = Date.now();
+      const delta = currentTime - startExpolision;
+      if (animateFrames === 6) {
+        // time delay for last frame
+        setTimeout(() => {
+          this.animationFinished = true;
+        }, 100);
+        return;
+      }
+      if (delta >= explosionDuration / 5) {
         this.width = objectWidth + 10;
         this.height = objectHeight + 10;
         this.angle = 0;
@@ -95,7 +202,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     requestAnimationFrame(update);
   }
 
-  //*******************************************************************
+  //******************************************
   damageDetect(causeOfObjects) {
     const mainTexture = this.mainTexture;
     const frontFace = this.y + this.height / 2;
@@ -128,7 +235,7 @@ export class EnemiesComponent extends GameObjectsComponent {
       }
     }
   }
-  //*******************************************************************
+  //******************************************
   animationChain(orders) {
     let currentOrderIndex = 0;
     const totalFramesOnEachAnimationSet = 40;
@@ -155,7 +262,7 @@ export class EnemiesComponent extends GameObjectsComponent {
         const finishX = order.finishX;
         const finishY = order.finishY;
         const motionType = order.motionType;
-        if (motionType === "straight") {
+        if (motionType === 'straight') {
           velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
           velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
         }
@@ -164,10 +271,10 @@ export class EnemiesComponent extends GameObjectsComponent {
           this.y = startY;
         }
         if (delta >= 1000 / 60) {
-           if(this.destroyed) {
-            currentOrderIndex = orders.length
+          if (this.destroyed) {
+            currentOrderIndex = orders.length;
             return;
-           }
+          }
           this.movement(velocityX, velocityY);
           animateFrames++;
           lastTime = currentTime;
@@ -183,3 +290,4 @@ export class EnemiesComponent extends GameObjectsComponent {
     }
   }
 }
+//**************************************************************
