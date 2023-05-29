@@ -1,8 +1,8 @@
-import { GameObjectsComponent } from './gameObjectsComponent.js';
+import { GameObjectsComponent, Player } from './gameObjectsComponent.js';
 import { mouseLocation } from './inputController.js';
 import { touchLocation, isTouchDevice } from './inputController.js';
 
-export const player = new GameObjectsComponent(40, 40, 'player.png', 175, 500);
+export const player = new Player(175, 500, 40, 40, 'player.png', 10);
 
 const touchController = () => {
   let { touchX, touchY } = touchLocation;
@@ -36,7 +36,7 @@ const bulletGenerator = () => {
   const currentTime = Date.now();
   const delta = currentTime - pastTime;
   if (touchLocation.onTouch || mouseLocation.leftClick) {
-    maxBulletAmount = 5;
+    maxBulletAmount = 7;
   } else {
     maxBulletAmount = 0;
   }
@@ -80,6 +80,6 @@ const renderBullets = () => {
 export const playerFunctions = () => {
   mouseController();
   isTouchDevice && touchController();
-  player.update();
+  !player.animationFinished && player.update();
   renderBullets();
 };
