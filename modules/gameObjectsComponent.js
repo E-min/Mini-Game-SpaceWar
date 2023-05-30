@@ -45,60 +45,73 @@ export class Player extends GameObjectsComponent {
     this.destroyed = false;
     this.animationFinished = false;
     this.bullets = [];
+    this.maxHealth = this.health
     this.bulletGenerator();
   }
+  healthBar() {
+    const healthPercent = new GameObjectsComponent(5, 30, 'health-percent.png', this.x + 30, this.y)
+    healthPercent.height = this.health * 3
+    if(this.health / this.maxHealth <= 0.2) {
+      healthPercent.textureName = 'health-low.png';
+    } else if (this.health / this.maxHealth <= 0.5) {
+      healthPercent.textureName = 'health-mid.png'
+    }
+    healthPercent.update()
+  }
+
   bulletGenerator() {
-    let pastTime = Date.now();
     let index = 0;
     let maxBulletAmount;
-    const update = () => {
+    setInterval(() => {
       const smallBulletSpawnX = this.x;
       const smallBulletSpawnY = this.y - 20;
-      const currentTime = Date.now();
-      const delta = currentTime - pastTime;
+      // stop or continue bullet firing
       if (touchLocation.onTouch || mouseLocation.leftClick) {
         maxBulletAmount = 7;
       } else {
         maxBulletAmount = 0;
       }
       this.destroyed && (maxBulletAmount = 0);
-      if (delta >= 200) {
-        const randomLaser = Math.floor(Math.random() * 3);
-        const laserSound = soundEffects[`laser${randomLaser}`];
-        laserSound.volume = 0.01;
-        if (maxBulletAmount) {
-          !laserSound.paused && (laserSound.currentTime = 0);
-          laserSound.play();
-        }
-        if (this.bullets.length < maxBulletAmount) {
-          this.bullets.push(
-            new GameObjectsComponent(
-              7,
-              20,
-              'small-red-bullet.png',
-              smallBulletSpawnX,
-              smallBulletSpawnY
-            )
-          );
-        }
-        if (index === this.bullets.length) {
-          index = 0;
-        }
-        if (this.bullets.length === maxBulletAmount && maxBulletAmount) {
-          this.bullets[index].hit = false;
-          this.bullets[index].x = smallBulletSpawnX;
-          this.bullets[index].y = smallBulletSpawnY;
-          index++;
-        }
-        pastTime = currentTime;
+      //******************************
+      //laser sound ******************
+      const randomLaser = Math.floor(Math.random() * 3);
+      const laserSound = soundEffects[`laser${randomLaser}`];
+      laserSound.volume = 0.01;
+      if (maxBulletAmount) {
+        !laserSound.paused && (laserSound.currentTime = 0);
+        laserSound.play();
       }
-      requestAnimationFrame(update);
-    };
-    requestAnimationFrame(update);
+      //******************************
+      //add bullets to pool***********
+      if (this.bullets.length < maxBulletAmount) {
+        this.bullets.push(
+          new GameObjectsComponent(
+            7,
+            20,
+            'small-red-bullet.png',
+            smallBulletSpawnX,
+            smallBulletSpawnY
+          )
+        );
+      }
+      //******************************
+      if (index === this.bullets.length) {
+        index = 0;
+      }
+      //reuse old bullets to create rapid firing
+      if (this.bullets.length === maxBulletAmount && maxBulletAmount) {
+        this.bullets[index].hit = false;
+        this.bullets[index].x = smallBulletSpawnX;
+        this.bullets[index].y = smallBulletSpawnY;
+        index++;
+      }
+      //******************************
+    }, 200);
   }
   update() {
     super.update();
     this.renderBullets();
+    this.healthBar();
   }
   renderBullets() {
     for (let i = 0; i < this.bullets.length; i++) {

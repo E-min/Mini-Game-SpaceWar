@@ -6,6 +6,9 @@ export const preloadTextures = function(callback) {
   const texturePaths = [
     "./textures/player.png",
     "./textures/player-hit.png",
+    "./textures/health-low.png",
+    "./textures/health-mid.png",
+    "./textures/health-percent.png",
     "./textures/background-repeat-1.png",
     "./textures/background-repeat-2.png",
     "./textures/small-red-bullet.png",
