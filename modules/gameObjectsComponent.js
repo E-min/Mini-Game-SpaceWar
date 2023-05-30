@@ -127,11 +127,13 @@ export class EnemiesComponent extends GameObjectsComponent {
     if (playerHit) {
       player.health--;
       player.textureName = 'player-hit.png';
-      if (!soundEffects.hit.paused) {
-        soundEffects.hit.pause();
-        soundEffects.hit.currentTime = 0;
+      const hitSound = soundEffects.hit;
+      hitSound.volume = 0.1;
+      if (!hitSound.paused) {
+        hitSound.pause();
+        hitSound.currentTime = 0;
       }
-      soundEffects.hit.play();
+      hitSound.play();
       setTimeout(() => {
         player.textureName = 'player.png';
       }, 200);
