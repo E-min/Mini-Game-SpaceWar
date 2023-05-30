@@ -1,5 +1,5 @@
 import { EnemiesComponent } from './gameObjectsComponent.js';
-import { bullets, player } from './playerFunctions.js';
+import { player } from './playerFunctions.js';
 
 //***********************enemy formations******************************
 const enemeyPaths = [
@@ -105,7 +105,7 @@ let isAllDestroyed = false;
 let enemySequence = 0;
 let timerId; // Variable to store the timer ID
 
-const sequenceTimeLimits = [15000, 20000, 23000];
+const sequenceTimeLimits = [18000, 20000, 23000];
 
 const createNewEnemies = (sequence) => {
   // Clear the previous timer if it exists
@@ -131,7 +131,7 @@ const createNewEnemies = (sequence) => {
         health = 5;
         width = 40;
         height = 40;
-        bulletAmount = 10;
+        bulletAmount = 5;
         bulletTexture = 'medium-red-bullet.png';
         break;
       case 'mini-drone':
@@ -182,7 +182,7 @@ const renderEnemies = () => {
     if (currentEnemy.destroyed) {
       destroyedCount++;
     } else {
-      currentEnemy.damageDetect(bullets);
+      currentEnemy.damageDetect(player.bullets);
     }
   }
   if (destroyedCount === currentEnemyAmount && isAllAnimationFinished === currentEnemyAmount) {

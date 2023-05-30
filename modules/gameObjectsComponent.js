@@ -1,5 +1,6 @@
 import { gameArea } from './gameArea.js';
 import { soundEffects } from './gameSoundEffects.js';
+import { mouseLocation, touchLocation } from './inputController.js';
 import { textureImages } from './preLoadTextures.js';
 
 // root of all objects in game******************************************
@@ -43,6 +44,70 @@ export class Player extends GameObjectsComponent {
     this.health = health;
     this.destroyed = false;
     this.animationFinished = false;
+    this.bullets = [];
+    this.bulletGenerator();
+  }
+  bulletGenerator() {
+    let pastTime = Date.now();
+    let index = 0;
+    let maxBulletAmount;
+    const update = () => {
+      const smallBulletSpawnX = this.x;
+      const smallBulletSpawnY = this.y - 20;
+      const currentTime = Date.now();
+      const delta = currentTime - pastTime;
+      if (touchLocation.onTouch || mouseLocation.leftClick) {
+        maxBulletAmount = 7;
+      } else {
+        maxBulletAmount = 0;
+      }
+      this.destroyed && (maxBulletAmount = 0);
+      if (delta >= 200) {
+        const randomLaser = Math.floor(Math.random() * 3);
+        const laserSound = soundEffects[`laser${randomLaser}`];
+        laserSound.volume = 0.01;
+        if (maxBulletAmount) {
+          !laserSound.paused && (laserSound.currentTime = 0);
+          laserSound.play();
+        }
+        if (this.bullets.length < maxBulletAmount) {
+          this.bullets.push(
+            new GameObjectsComponent(
+              7,
+              20,
+              'small-red-bullet.png',
+              smallBulletSpawnX,
+              smallBulletSpawnY
+            )
+          );
+        }
+        if (index === this.bullets.length) {
+          index = 0;
+        }
+        if (this.bullets.length === maxBulletAmount && maxBulletAmount) {
+          this.bullets[index].hit = false;
+          this.bullets[index].x = smallBulletSpawnX;
+          this.bullets[index].y = smallBulletSpawnY;
+          index++;
+        }
+        pastTime = currentTime;
+      }
+      requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+  update() {
+    super.update();
+    this.renderBullets();
+  }
+  renderBullets() {
+    for (let i = 0; i < this.bullets.length; i++) {
+      const bullet = this.bullets[i];
+      if (!bullet.hit) {
+        bullet.movement(0, -10);
+        bullet.update();
+      }
+    }
   }
   exploison() {
     const explosionDuration = 300;
@@ -112,6 +177,22 @@ export class EnemiesComponent extends GameObjectsComponent {
         bullet.movement(0, 7);
         bullet.update();
       }
+      // bullet to bullet collision
+      for (let j = 0; j < player.bullets.length; j++) {
+        if (player.bullets[j].hit) {
+          continue;
+        }
+        if (
+          player.bullets[j].y - 8 <= bullet.y &&
+          player.bullets[j].y + 8 >= bullet.y &&
+          player.bullets[j].x - 8 <= bullet.x &&
+          player.bullets[j].x + 8 >= bullet.x
+        ) {
+          bullet.hit = true;
+          player.bullets[j].hit = true;
+        }
+      }
+      //******************************
       if (
         player.y - player.height / 2 <= bullet.y &&
         player.y + player.height / 2 >= bullet.y &&
@@ -126,20 +207,20 @@ export class EnemiesComponent extends GameObjectsComponent {
     }
     if (playerHit) {
       player.health--;
+      if (player.health <= 0) {
+        player.exploison();
+        return;
+      }
       player.textureName = 'player-hit.png';
       const hitSound = soundEffects.hit;
       hitSound.volume = 0.1;
       if (!hitSound.paused) {
-        hitSound.pause();
         hitSound.currentTime = 0;
       }
       hitSound.play();
       setTimeout(() => {
         player.textureName = 'player.png';
       }, 200);
-      if (player.health <= 0) {
-        player.exploison();
-      }
       playerHit = false;
     }
   }
@@ -153,12 +234,11 @@ export class EnemiesComponent extends GameObjectsComponent {
     let lastTime = Date.now();
     let bulletCycle = 0;
     let index = 0;
-    let randomBulletDelay = 2000; //(Math.floor(Math.random() * 50) + 1) * 300 ;
+    let randomBulletDelay = (Math.floor(Math.random() * 5) + 1) * 800;
     const update = () => {
       const currentTime = Date.now();
       const delta = currentTime - lastTime;
       if (delta >= randomBulletDelay) {
-        console.log(randomBulletDelay);
         if (this.destroyed) return;
         if (bulletCycle !== this.bulletAmount - 1) {
           const newBullet = new GameObjectsComponent(10, 10, this.bulletTexture, this.x, this.y);
@@ -192,7 +272,6 @@ export class EnemiesComponent extends GameObjectsComponent {
     const exploisonSound = soundEffects[`exploison${randomExploison}`];
     exploisonSound.volume = 0.05;
     if (!exploisonSound.paused) {
-      exploisonSound.pause();
       exploisonSound.currentTime = 0;
     }
     exploisonSound.play();
