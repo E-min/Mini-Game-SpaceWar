@@ -46,17 +46,31 @@ export class Player extends GameObjectsComponent {
     this.animationFinished = false;
     this.bullets = [];
     this.maxHealth = this.health
+    this.doubleHealth = false;
     this.bulletGenerator();
+    this.healthBarFirst = new GameObjectsComponent(5, 30, 'health-percent.png', this.x + 30, this.y)
+    this.healthBarSecond = new GameObjectsComponent(5, 30, 'health-extra.png', this.x + 38, this.y)
   }
   healthBar() {
-    const healthPercent = new GameObjectsComponent(5, 30, 'health-percent.png', this.x + 30, this.y)
-    healthPercent.height = this.health * 3
-    if(this.health / this.maxHealth <= 0.2) {
-      healthPercent.textureName = 'health-low.png';
-    } else if (this.health / this.maxHealth <= 0.5) {
-      healthPercent.textureName = 'health-mid.png'
+    this.healthBarFirst.x = this.x + 30;
+    this.healthBarFirst.y = this.y;
+    this.healthBarSecond.x = this.x + 38;
+    this.healthBarSecond.y = this.y;
+    if(this.health > this.maxHealth) {
+      this.healthBarFirst.textureName = 'health-percent.png';
+      this.healthBarSecond.height = ((this.health % 11)* 3) + 3;
+      this.healthBarFirst.height = this.maxHealth * 3;
+    } else {
+      this.healthBarSecond.height = 0;
+      this.healthBarFirst.height = this.health * 3;
     }
-    healthPercent.update()
+    if(this.health / this.maxHealth <= 0.2) {
+      this.healthBarFirst.textureName = 'health-low.png';
+    } else if (this.health / this.maxHealth <= 0.5) {
+      this.healthBarFirst.textureName = 'health-mid.png'
+    }
+    this.healthBarFirst.update()
+    this.doubleHealth && this.healthBarSecond.update()
   }
 
   bulletGenerator() {
