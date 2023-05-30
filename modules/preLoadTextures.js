@@ -5,9 +5,11 @@ export const preloadTextures = function(callback) {
   // Array to store the paths of the texture images
   const texturePaths = [
     "./textures/player.png",
+    "./textures/player-hit.png",
     "./textures/background-repeat-1.png",
     "./textures/background-repeat-2.png",
     "./textures/small-red-bullet.png",
+    "./textures/medium-red-bullet.png",
     "./textures/enemy-mini-drone.png",
     "./textures/enemy-mini-ship.png",
     "./textures/enemy-mini-ship-hit.png",
