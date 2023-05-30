@@ -125,19 +125,21 @@ const createNewEnemies = (sequence) => {
     const enemyType = sequence[i][0];
     const pathIndex = sequence[i][1];
 
-    let health, width, height, bulletAmount;
+    let health, width, height, bulletAmount, bulletTexture;
     switch (enemyType) {
       case 'mini-ship':
         health = 5;
         width = 40;
         height = 40;
         bulletAmount = 10;
+        bulletTexture = 'medium-red-bullet.png';
         break;
       case 'mini-drone':
         health = 2;
         width = 20;
         height = 20;
         bulletAmount = 5;
+        bulletTexture = 'green-orb.png';
         break;
     }
     const newEnemy = new EnemiesComponent(
@@ -147,7 +149,8 @@ const createNewEnemies = (sequence) => {
       height,
       `enemy-${enemyType}.png`,
       health,
-      bulletAmount
+      bulletAmount,
+      bulletTexture
     );
     currentEnemies.push(newEnemy);
     currentEnemyFormations.push(enemeyPaths[pathIndex]);

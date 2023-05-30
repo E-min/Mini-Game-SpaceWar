@@ -40,6 +40,7 @@ const bulletGenerator = () => {
   } else {
     maxBulletAmount = 0;
   }
+  player.destroyed && (maxBulletAmount = 0);
   if (delta >= 200) {
     if (bullets.length < maxBulletAmount) {
       bullets.push(

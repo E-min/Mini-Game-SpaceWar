@@ -84,7 +84,7 @@ export class Player extends GameObjectsComponent {
 }
 // blueprint for All enemies*******************************
 export class EnemiesComponent extends GameObjectsComponent {
-  constructor(x, y, width, height, textureName, health, bulletAmount) {
+  constructor(x, y, width, height, textureName, health, bulletAmount, bulletTexture) {
     super();
     this.width = width;
     this.height = height;
@@ -92,6 +92,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     this.y = y;
     this.textureName = textureName;
     this.mainTexture = this.textureName.slice(0, -4);
+    this.bulletTexture = bulletTexture;
     this.health = health;
     this.angle = 0;
     this.destroyed = false;
@@ -108,7 +109,7 @@ export class EnemiesComponent extends GameObjectsComponent {
         continue;
       }
       if (!bullet.hit) {
-        bullet.movement(0, 10);
+        bullet.movement(0, 7);
         bullet.update();
       }
       if (
@@ -117,13 +118,26 @@ export class EnemiesComponent extends GameObjectsComponent {
         player.x - player.width / 2 <= bullet.x &&
         player.x + player.width / 2 >= bullet.x
       ) {
-        bullet.hit = true;
-        playerHit = true;
+        if (player.health > 0) {
+          bullet.hit = true;
+          playerHit = true;
+        }
       }
     }
     if (playerHit) {
       player.health--;
-      player.health === 0 && player.exploison();
+      player.textureName = 'player-hit.png';
+      if (!soundEffects.hit.paused) {
+        soundEffects.hit.pause();
+        soundEffects.hit.currentTime = 0;
+      }
+      soundEffects.hit.play();
+      setTimeout(() => {
+        player.textureName = 'player.png';
+      }, 200);
+      if (player.health <= 0) {
+        player.exploison();
+      }
       playerHit = false;
     }
   }
@@ -137,14 +151,15 @@ export class EnemiesComponent extends GameObjectsComponent {
     let lastTime = Date.now();
     let bulletCycle = 0;
     let index = 0;
+    let randomBulletDelay = 2000; //(Math.floor(Math.random() * 50) + 1) * 300 ;
     const update = () => {
-      const randomBulletDelay = (Math.floor(Math.random() * 5) + 3) * 1000;
       const currentTime = Date.now();
       const delta = currentTime - lastTime;
       if (delta >= randomBulletDelay) {
+        console.log(randomBulletDelay);
         if (this.destroyed) return;
         if (bulletCycle !== this.bulletAmount - 1) {
-          const newBullet = new GameObjectsComponent(10, 10, 'green-orb.png', this.x, this.y);
+          const newBullet = new GameObjectsComponent(10, 10, this.bulletTexture, this.x, this.y);
           this.enemyBullets.push(newBullet);
           bulletCycle++;
         }
