@@ -5,10 +5,12 @@ import { playerFunctions } from "./playerFunctions.js";
 export const canvas = document.getElementById('canvas');
 canvas.height = 600;
 canvas.width = 350;
+let frameCount = 0;
+let startTime = performance.now();
 
 export const gameArea = {
   canvas: document.getElementById('canvas'),
-  fps: 60,
+  fps: 80,
   miliseconds: Date.now(),
   start: function () {
     this.context = this.canvas.getContext("2d");
@@ -19,6 +21,7 @@ export const gameArea = {
       if (delta >= 1000 / this.fps) {
         updateGameArea();
         previousTime = currentTime;
+        frameCount++
       }
       requestAnimationFrame(frameRefresher);
     };
@@ -28,6 +31,16 @@ export const gameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
 };
+// setInterval(() => {
+//   const currentTime = performance.now();
+//   const elapsedSeconds = (currentTime - startTime) / 1000; // Convert to seconds
+//   const fps = frameCount / elapsedSeconds;
+
+//   console.log(`FPS: ${fps.toFixed(2)}`);
+
+//   frameCount = 0;
+//   startTime = currentTime;
+// }, 1000); // Update every second
 
 const backgroundFirst = new GameObjectsComponent(
   canvas.height,
@@ -45,7 +58,7 @@ const backgroundSecond = new GameObjectsComponent(
 );
 // place functions that renders in game
 export const updateGameArea = () => {
-  gameArea.clear();
+  // gameArea.clear();
   backgroundRepeat();
   playerFunctions();
   enemiesFunctions()

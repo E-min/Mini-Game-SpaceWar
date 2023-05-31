@@ -24,20 +24,45 @@ const mouseController = () => {
     player.y = y;
   }
 };
-const powerUp = new GameObjectsComponent(30, 30, 'double-health-0.png', 175, -50);
-powerUp.gained = true
-let selectedPowerUp;
-
-const doubleHealth = () => {
-  let lastTime = Date.now();
+const powerUp = new GameObjectsComponent(
+  30,
+  30,
+  'double-health-frames/double-health-0.png',
+  175,
+  -50
+);
+powerUp.gained = true;
+let randomNumber;
+const createRandomPowerUp = () => {
+  powerUp.gained = true;
+  randomNumber = Math.floor(Math.random() * 2) + 1;
+};
+const powerUpFrames = () => {
+  if (!powerUp.gained) {
+    return;
+  }
+  let maxFrame = 0;
   let frame = 0;
+  let lastTime = Date.now();
   const update = () => {
     const currentTime = Date.now();
     const delta = currentTime - lastTime;
-    if (delta >= 50) {
-      powerUp.textureName = `double-health-${frame}.png`
-      frame++
-      if(frame >= 10) {
+    if (delta >= 100) {
+      switch (randomNumber) {
+        case 1:
+          powerUp.textureName = `double-health-frames/double-health-${frame}.png`;
+          maxFrame = 10;
+          break;
+        case 2:
+          powerUp.textureName = `double-barrel-frames/double-barrel-${frame}.png`;
+          maxFrame = 12;
+          break;
+        case 3:
+          tripleBarrel();
+          break;
+      }
+      frame++;
+      if (frame >= maxFrame) {
         frame = 0;
       }
       lastTime = currentTime;
@@ -46,17 +71,7 @@ const doubleHealth = () => {
   };
   requestAnimationFrame(update);
 };
-
-const createRandomPowerUp = () => {
-  powerUp.gained = true;
-  const randomNumber = 1; //Math.floor(Math.random() * 4)
-  selectedPowerUp = randomNumber;
-  switch (randomNumber) {
-    case 1:
-      doubleHealth();
-      break;
-  }
-};
+powerUpFrames();
 
 setInterval(() => {
   createRandomPowerUp();
@@ -65,17 +80,6 @@ setInterval(() => {
   powerUp.y = -50;
   powerUp.gained = false;
 }, 20000);
-// let lastTime = Date.now();
-// const update = () => {
-//   const currentTime = Date.now();
-//   const delta = currentTime - lastTime;
-//   if (delta >= 100) {
-//     lastTime = currentTime;
-//   }
-//   requestAnimationFrame(update);
-// };
-// requestAnimationFrame(update);
-
 const renderPowerUps = () => {
   if (
     powerUp.y + powerUp.height / 2 > player.y - player.height / 2 &&
@@ -84,13 +88,29 @@ const renderPowerUps = () => {
     powerUp.x - powerUp.width / 2 < player.x + player.height / 2 &&
     !powerUp.gained
   ) {
-    switch (selectedPowerUp) {
+    switch (randomNumber) {
       case 1:
         player.doubleHealth = true;
-        player.health = player.maxHealth * 2
-        powerUp.gained = true;
+        player.health = player.maxHealth * 2;
+        break;
+      case 2:
+        player.doubleBarrel = true;
+        player.multipleBarrels();
+        setTimeout(() => {
+          player.doubleBarrel = false;
+          player.multipleBarrels();
+        }, 10000);
+        break;
+      case 3:
+        player.tripleBarrel = true;
+        player.multipleBarrels();
+        setTimeout(() => {
+          player.tripleBarrel = false;
+          player.multipleBarrels();
+        }, 10000);
         break;
     }
+    powerUp.gained = true;
   }
   if (!powerUp.gained) {
     powerUp.movement(0, 3);

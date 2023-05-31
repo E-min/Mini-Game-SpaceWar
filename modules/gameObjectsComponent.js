@@ -47,7 +47,11 @@ export class Player extends GameObjectsComponent {
     this.bullets = [];
     this.maxHealth = this.health;
     this.doubleHealth = false;
-    this.bulletGenerator();
+    this.doubleBarrel = false;
+    this.tripleBarrel = false;
+    this.intervals = [];
+    this.maxBulletAmount = 18;
+    this.multipleBarrels();
     this.healthBarFirst = new GameObjectsComponent(
       5,
       30,
@@ -83,55 +87,91 @@ export class Player extends GameObjectsComponent {
     this.doubleHealth && this.healthBarSecond.update();
   }
 
-  bulletGenerator() {
-    let index = 0;
-    let maxBulletAmount;
-    setInterval(() => {
-      const smallBulletSpawnX = this.x;
-      const smallBulletSpawnY = this.y - 20;
-      // stop or continue bullet firing
-      if (touchLocation.onTouch || mouseLocation.leftClick) {
-        maxBulletAmount = 7;
+  multipleBarrels() {
+    const bulletGenerator = (barrel) => {
+      let barrelsLastIndex,
+        gapX = 0,
+        gapY = 0;
+      let index = barrel;
+      let maxBullet = this.maxBulletAmount;
+      if (barrel == 0) {
+        barrelsLastIndex = this.maxBulletAmount - 3;
+        gapX = 10;
+      } else if (barrel === 1) {
+        barrelsLastIndex = this.maxBulletAmount - 2;
+        gapX = -10;
       } else {
-        maxBulletAmount = 0;
+        barrelsLastIndex = this.maxBulletAmount - 1;
+        gapY = -20;
       }
-      this.destroyed && (maxBulletAmount = 0);
-      //******************************
-      //laser sound ******************
-      const randomLaser = Math.floor(Math.random() * 3);
-      const laserSound = soundEffects[`laser${randomLaser}`];
-      laserSound.volume = 0.01;
-      if (maxBulletAmount) {
-        !laserSound.paused && (laserSound.currentTime = 0);
-        laserSound.play();
-      }
-      //******************************
-      //add bullets to pool***********
-      if (this.bullets.length < maxBulletAmount) {
-        this.bullets.push(
-          new GameObjectsComponent(
-            7,
-            20,
-            'small-red-bullet.png',
-            smallBulletSpawnX,
-            smallBulletSpawnY
-          )
-        );
-      }
-      //******************************
-      if (index === this.bullets.length) {
-        index = 0;
-      }
-      //reuse old bullets to create rapid firing
-      if (this.bullets.length === maxBulletAmount && maxBulletAmount) {
-        this.bullets[index].hit = false;
-        this.bullets[index].x = smallBulletSpawnX;
-        this.bullets[index].y = smallBulletSpawnY;
-        index++;
-      }
-      //******************************
-    }, 200);
+
+      const interval = setInterval(() => {
+        const smallBulletSpawnX = this.x + gapX;
+        const smallBulletSpawnY = this.y + gapY;
+        // stop or continue bullet firing
+        if (touchLocation.onTouch || mouseLocation.leftClick) {
+          maxBullet = this.maxBulletAmount;
+        } else {
+          maxBullet = 0;
+        }
+        this.destroyed && (maxBullet = 0);
+        //******************************
+        //laser sound ******************
+        const randomLaser = Math.floor(Math.random() * 3);
+        const laserSound = soundEffects[`laser${randomLaser}`];
+        laserSound.volume = 0.01;
+        if (maxBullet) {
+          !laserSound.paused && (laserSound.currentTime = 0);
+          laserSound.play();
+        }
+        //******************************
+        //add bullets to pool***********
+        if (this.bullets.length < maxBullet) {
+          this.bullets.push(
+            new GameObjectsComponent(
+              7,
+              20,
+              'small-red-bullet.png',
+              smallBulletSpawnX,
+              smallBulletSpawnY
+            )
+          );
+        }
+        //******************************
+
+        //reuse old bullets to create rapid firing
+        if (this.bullets.length === maxBullet && maxBullet) {
+          this.bullets[index].hit = false;
+          this.bullets[index].x = smallBulletSpawnX;
+          this.bullets[index].y = smallBulletSpawnY;
+          index += 3;
+        }
+        //******************************
+        if (index === barrelsLastIndex) {
+          index = barrel;
+        }
+      }, 200);
+
+      this.intervals.push(interval); // Store the interval ID
+    };
+
+    // Clear intervals of old barrels
+    this.intervals.forEach((interval) => clearInterval(interval));
+    this.intervals = [];
+
+    // Start new intervals based on barrel configuration
+    if (this.tripleBarrel) {
+      bulletGenerator(0); // barrel one
+      bulletGenerator(1); // barrel two
+      bulletGenerator(2); // barrel three
+    } else if (this.doubleBarrel) {
+      bulletGenerator(0); // barrel one
+      bulletGenerator(1); // barrel two
+    } else {
+      bulletGenerator(2); // barrel three
+    }
   }
+
   update() {
     super.update();
     this.renderBullets();
