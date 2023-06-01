@@ -383,6 +383,9 @@ export class EnemiesComponent extends GameObjectsComponent {
     const right = this.x + this.width / 2;
     const left = this.x - this.width / 2;
     for (let i = 0; i < causeOfObjects.length; i++) {
+      if(causeOfObjects[i].y < 0) {
+        causeOfObjects[i].hit = true;
+      }
       // if bullet did hit, pass the collision check
       if (causeOfObjects[i].hit) continue;
       if (

@@ -7,4 +7,5 @@ export const soundEffects = {
     laser2: document.getElementById('laser2'),
     laser3: document.getElementById('laser3'),
     hit: document.getElementById('hit'),
+    powerup: document.getElementById('powerup')
 }

@@ -1,4 +1,5 @@
 import { GameObjectsComponent, Player } from './gameObjectsComponent.js';
+import { soundEffects } from './gameSoundEffects.js';
 import { mouseLocation } from './inputController.js';
 import { touchLocation, isTouchDevice } from './inputController.js';
 
@@ -33,18 +34,26 @@ const powerUp = new GameObjectsComponent(
 );
 powerUp.gained = true;
 let randomNumber;
+
 const createRandomPowerUp = () => {
-  powerUp.gained = true;
-  randomNumber = Math.floor(Math.random() * 2) + 1;
+  randomNumber = Math.floor(Math.random() * 3) + 1;
+  if (randomNumber === 3) {
+    powerUp.width = 50;
+    powerUp.height = 50;
+  } else {
+    powerUp.width = 40;
+    powerUp.height = 40;
+  }
+ powerUpFrames();
 };
 const powerUpFrames = () => {
-  if (!powerUp.gained) {
-    return;
-  }
-  let maxFrame = 0;
   let frame = 0;
+  let maxFrame = 0;
   let lastTime = Date.now();
   const update = () => {
+    if(powerUp.gained) {
+      return;
+    }
     const currentTime = Date.now();
     const delta = currentTime - lastTime;
     if (delta >= 100) {
@@ -55,10 +64,11 @@ const powerUpFrames = () => {
           break;
         case 2:
           powerUp.textureName = `double-barrel-frames/double-barrel-${frame}.png`;
-          maxFrame = 12;
+          maxFrame = 13;
           break;
         case 3:
-          tripleBarrel();
+          powerUp.textureName = `triple-barrel-frames/triple-barrel-${frame}.png`;
+          maxFrame = 13;
           break;
       }
       frame++;
@@ -71,7 +81,6 @@ const powerUpFrames = () => {
   };
   requestAnimationFrame(update);
 };
-powerUpFrames();
 
 setInterval(() => {
   createRandomPowerUp();
@@ -79,8 +88,12 @@ setInterval(() => {
   powerUp.x = randomXaxis;
   powerUp.y = -50;
   powerUp.gained = false;
-}, 20000);
+}, 12000);
+
 const renderPowerUps = () => {
+  if (powerUp.y > canvas.height + 50) {
+    powerUp.gained = true;
+  }
   if (
     powerUp.y + powerUp.height / 2 > player.y - player.height / 2 &&
     powerUp.y - powerUp.height / 2 < player.y + player.height / 2 &&
@@ -110,6 +123,7 @@ const renderPowerUps = () => {
         }, 10000);
         break;
     }
+    soundEffects.powerup.play();
     powerUp.gained = true;
   }
   if (!powerUp.gained) {
