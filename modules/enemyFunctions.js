@@ -124,7 +124,6 @@ const createNewEnemies = (sequence) => {
   for (let i = 0; i < sequence.length; i++) {
     const enemyType = sequence[i][0];
     const pathIndex = sequence[i][1];
-
     let health, width, height, bulletAmount, bulletTexture;
     switch (enemyType) {
       case 'mini-ship':

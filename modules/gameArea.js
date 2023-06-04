@@ -1,37 +1,38 @@
-import { enemiesFunctions } from "./enemyFunctions.js";
-import { GameObjectsComponent } from "./gameObjectsComponent.js";
-import { playerFunctions } from "./playerFunctions.js";
+import { enemiesFunctions } from './enemyFunctions.js';
+import { GameObjectsComponent } from './gameObjectsComponent.js';
+import { player, playerFunctions } from './playerFunctions.js';
 
 export const canvas = document.getElementById('canvas');
 canvas.height = 600;
 canvas.width = 350;
+let animateId;
 
 export const gameArea = {
   canvas: document.getElementById('canvas'),
   start: function () {
-    this.context = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext('2d');
     const frameRefresher = () => {
-        updateGameArea();
-      requestAnimationFrame(frameRefresher);
-    };
-    frameRefresher();
-  },
-  clear: function () {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      updateGameArea();
+      animateId = requestAnimationFrame(frameRefresher);
+      if (player.health <= 0) {
+        cancelAnimationFrame(animateId);
+        location.reload()
+      }
+    }; 
+    requestAnimationFrame(frameRefresher);
   },
 };
-
 const backgroundFirst = new GameObjectsComponent(
   canvas.height,
   canvas.width,
-  "background-repeat-1.png",
+  'background-repeat-1.png',
   canvas.width / 2,
   -canvas.height / 2
 );
 const backgroundSecond = new GameObjectsComponent(
   canvas.height,
   canvas.width,
-  "background-repeat-2.png",
+  'background-repeat-2.png',
   canvas.width / 2,
   canvas.height / 2
 );
@@ -39,7 +40,7 @@ const backgroundSecond = new GameObjectsComponent(
 export const updateGameArea = () => {
   backgroundRepeat();
   playerFunctions();
-  enemiesFunctions()
+  enemiesFunctions();
 };
 
 const backgroundRepeat = () => {
@@ -49,8 +50,8 @@ const backgroundRepeat = () => {
   backgroundSecond.angle = 90;
   backgroundFirst.movement(0, 5);
   backgroundSecond.movement(0, 5);
-  backgroundFirst.y >= canvas.height + (canvas.height / 2) &&
+  backgroundFirst.y >= canvas.height + canvas.height / 2 &&
     ((backgroundFirst.y = -canvas.height / 2), (backgroundFirst.angle += 90));
-  backgroundSecond.y >= canvas.height + (canvas.height / 2) &&
+  backgroundSecond.y >= canvas.height + canvas.height / 2 &&
     ((backgroundSecond.y = -canvas.height / 2), (backgroundSecond.angle -= 90));
 };
