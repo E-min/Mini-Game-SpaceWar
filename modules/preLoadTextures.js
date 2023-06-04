@@ -50,6 +50,7 @@ export const preloadTextures = function (callback) {
     './textures/background-repeat-2.png',
     './textures/small-red-bullet.png',
     './textures/medium-red-bullet.png',
+    './textures/large-red-bullet.png',
     './textures/enemy-mini-drone.png',
     './textures/enemy-mini-ship.png',
     './textures/enemy-mini-ship-hit.png',

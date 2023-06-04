@@ -138,7 +138,6 @@ export class Player extends GameObjectsComponent {
           );
         }
         //******************************
-
         //reuse old bullets to create rapid firing
         if (this.bullets.length === maxBullet && maxBullet) {
           this.bullets[index].hit = false;
