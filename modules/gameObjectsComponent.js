@@ -3,6 +3,45 @@ import { soundEffects } from './gameSoundEffects.js';
 import { mouseLocation, touchLocation } from './inputController.js';
 import { textureImages } from './preLoadTextures.js';
 
+export class AnimationSpriteSheet {
+  constructor(spriteSheet, destWidth, destHeight, destX, destY, srcWidth, srcHeight) {
+    this.destWidth = destWidth;
+    this.destHeight = destHeight;
+    this.destX = destX;
+    this.destY = destY;
+    this.spriteSheet = spriteSheet;
+    this.srcX = 0;
+    this.srcY = 0;
+    this.srcWidth = srcWidth;
+    this.srcHeight = srcHeight;
+  }
+  update() {
+    const context = canvas.getContext('2d');
+    const texture = textureImages[`./textures/${this.spriteSheet}`];
+    context.drawImage(
+      texture,
+      this.srcX,
+      this.srcY,
+      this.srcWidth,
+      this.srcHeight,
+      this.destX,
+      this.destY,
+      this.destWidth,
+      this.destHeight
+    );
+  }
+  frames(totalFrames) {
+    const totalWidth = this.srcWidth * totalFrames;
+    this.srcX += this.srcWidth;
+    if (this.srcX >= totalWidth) {
+      this.srcX = 0;
+    }
+  }
+  movement(moveX = 0, moveY = 0) {
+    this.destX += moveX;
+    this.destY += moveY;
+  }
+}
 // root of all objects in game******************************************
 export class GameObjectsComponent {
   constructor(width, height, textureName, x, y) {

@@ -1,4 +1,5 @@
-import { GameObjectsComponent, Player } from './gameObjectsComponent.js';
+import { canvas } from './gameArea.js';
+import { AnimationSpriteSheet, Player } from './gameObjectsComponent.js';
 import { soundEffects } from './gameSoundEffects.js';
 import { mouseLocation } from './inputController.js';
 import { touchLocation, isTouchDevice } from './inputController.js';
@@ -25,81 +26,81 @@ const mouseController = () => {
     player.y = y;
   }
 };
-const powerUp = new GameObjectsComponent(
+const newPowerUp = new AnimationSpriteSheet(
+  'double-barrel-sprite-sheet.png',
   30,
   30,
-  'double-health-frames/double-health-0.png',
   175,
-  -50
+  0,
+  100,
+  100
 );
-powerUp.gained = true;
+newPowerUp.gained = true;
 let randomNumber;
-
-const createRandomPowerUp = () => {
-  randomNumber = Math.floor(Math.random() * 3) + 1;
-  if (randomNumber === 3) {
-    powerUp.width = 50;
-    powerUp.height = 50;
-  } else {
-    powerUp.width = 40;
-    powerUp.height = 40;
-  }
- powerUpFrames();
-};
-const powerUpFrames = () => {
-  let frame = 0;
-  let maxFrame = 0;
-  let lastTime = Date.now();
-  const update = () => {
-    if(powerUp.gained) {
-      return;
-    }
-    const currentTime = Date.now();
-    const delta = currentTime - lastTime;
-    if (delta >= 100) {
-      switch (randomNumber) {
-        case 1:
-          powerUp.textureName = `double-health-frames/double-health-${frame}.png`;
-          maxFrame = 10;
-          break;
-        case 2:
-          powerUp.textureName = `double-barrel-frames/double-barrel-${frame}.png`;
-          maxFrame = 13;
-          break;
-        case 3:
-          powerUp.textureName = `triple-barrel-frames/triple-barrel-${frame}.png`;
-          maxFrame = 13;
-          break;
-      }
-      frame++;
-      if (frame >= maxFrame) {
-        frame = 0;
-      }
-      lastTime = currentTime;
-    }
-    requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
-};
-
+let totalFrames;
 setInterval(() => {
-  createRandomPowerUp();
-  const randomXaxis = Math.floor(Math.random() * 280) + 50;
-  powerUp.x = randomXaxis;
-  powerUp.y = -50;
-  powerUp.gained = false;
-}, 12000);
+  randomNumber = Math.floor(Math.random() * 3) + 1
+  let srcWidth, srcHeight, destHeight, destWidth, spriteSheet;
+  switch (randomNumber) {
+    case 1:
+      spriteSheet = 'double-health-sprite-sheet.png';
+      srcWidth = 64;
+      srcHeight = 64;
+      destHeight = 30;
+      destWidth = 30;
+      totalFrames = 10;
+      break;
+    case 2:
+      spriteSheet = 'double-barrel-sprite-sheet.png';
+      srcWidth = 100;
+      srcHeight = 100;
+      destHeight = 40;
+      destWidth = 40;
+      totalFrames = 13;
+      break;
+    case 3:
+      spriteSheet = 'triple-barrel-sprite-sheet.png';
+      srcWidth = 129;
+      srcHeight = 129;
+      destHeight = 50;
+      destWidth = 50;
+      totalFrames = 13;
+      break;
+  }
+  newPowerUp.spriteSheet = spriteSheet;
+  newPowerUp.srcWidth = srcWidth;
+  newPowerUp.srcHeight = srcHeight;
+  newPowerUp.destHeight = destHeight;
+  newPowerUp.destWidth = destWidth;
+  const randomXaxis = Math.floor(Math.random() * 300);
+  newPowerUp.destX = randomXaxis;
+  newPowerUp.destY = -50;
+  newPowerUp.gained = false;
+}, 13000);
+
+let pastTime = Date.now();
+const powerUpFrames = () => {
+  const currentTime = Date.now();
+  const delta = currentTime - pastTime;
+  if (delta >= 100) {
+    if(newPowerUp.gained) {
+      totalFrames = 0;
+    }
+    newPowerUp.frames(totalFrames);
+    pastTime = currentTime;
+  }
+};
 
 const renderPowerUps = () => {
-  if (powerUp.y > canvas.height + 50) {
-    powerUp.gained = true;
+  if (newPowerUp.destY > canvas.height + 50) {
+    newPowerUp.gained = true;
   }
   if (
-    powerUp.y + powerUp.height / 2 > player.y - player.height / 2 &&
-    powerUp.y - powerUp.height / 2 < player.y + player.height / 2 &&
-    powerUp.x + powerUp.width / 2 > player.x - player.height / 2 &&
-    powerUp.x - powerUp.width / 2 < player.x + player.height / 2 &&
-    !powerUp.gained
+    newPowerUp.destY + newPowerUp.destHeight> player.y - player.height / 2 &&
+    newPowerUp.destY < player.y + player.height / 2 &&
+    newPowerUp.destX + newPowerUp.destWidth > player.x - player.height / 2 &&
+    newPowerUp.destX < player.x + player.height / 2 &&
+    !newPowerUp.gained
   ) {
     switch (randomNumber) {
       case 1:
@@ -124,15 +125,25 @@ const renderPowerUps = () => {
         break;
     }
     soundEffects.powerup.play();
-    powerUp.gained = true;
+    newPowerUp.gained = true;
   }
-  if (!powerUp.gained) {
-    powerUp.movement(0, 3);
-    powerUp.update();
+  if (!newPowerUp.gained) {
+    newPowerUp.movement(0, 3);
+    newPowerUp.update();
   }
 };
 
+// let lastTime = Date.now();
+// const animateSpriteSheet = () => {
+//   const currentTime = Date.now();
+//   const delta = currentTime - lastTime;
+//   if (delta >= 100) {
+//     lastTime = currentTime;
+//   }
+// };
+
 export const playerFunctions = () => {
+  powerUpFrames();
   mouseController();
   isTouchDevice && touchController();
   renderPowerUps();
