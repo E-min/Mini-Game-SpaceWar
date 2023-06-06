@@ -26,6 +26,7 @@ const mouseController = () => {
     player.y = y;
   }
 };
+
 const newPowerUp = new AnimationSpriteSheet(
   'double-barrel-sprite-sheet.png',
   30,
@@ -35,59 +36,63 @@ const newPowerUp = new AnimationSpriteSheet(
   100,
   100
 );
+const propsOfPowerUps = [
+  {
+    spriteSheet: 'double-health-sprite-sheet.png',
+    srcWidth: 64,
+    srcHeight: 64,
+    destHeight: 30,
+    destWidth: 30,
+    totalFrames: 10,
+  },
+  {
+    spriteSheet: 'double-barrel-sprite-sheet.png',
+    srcWidth: 100,
+    srcHeight: 100,
+    destHeight: 40,
+    destWidth: 40,
+    totalFrames: 13,
+  },
+  {
+    spriteSheet: 'triple-barrel-sprite-sheet.png',
+    srcWidth: 129,
+    srcHeight: 129,
+    destHeight: 50,
+    destWidth: 50,
+    totalFrames: 13,
+  },
+];
 newPowerUp.gained = true;
 let randomNumber;
 let totalFrames;
+
+// spawn new power up
 setInterval(() => {
-  randomNumber = Math.floor(Math.random() * 3) + 1
-  let srcWidth, srcHeight, destHeight, destWidth, spriteSheet;
-  switch (randomNumber) {
-    case 1:
-      spriteSheet = 'double-health-sprite-sheet.png';
-      srcWidth = 64;
-      srcHeight = 64;
-      destHeight = 30;
-      destWidth = 30;
-      totalFrames = 10;
-      break;
-    case 2:
-      spriteSheet = 'double-barrel-sprite-sheet.png';
-      srcWidth = 100;
-      srcHeight = 100;
-      destHeight = 40;
-      destWidth = 40;
-      totalFrames = 13;
-      break;
-    case 3:
-      spriteSheet = 'triple-barrel-sprite-sheet.png';
-      srcWidth = 129;
-      srcHeight = 129;
-      destHeight = 50;
-      destWidth = 50;
-      totalFrames = 13;
-      break;
-  }
-  newPowerUp.spriteSheet = spriteSheet;
-  newPowerUp.srcWidth = srcWidth;
-  newPowerUp.srcHeight = srcHeight;
-  newPowerUp.destHeight = destHeight;
-  newPowerUp.destWidth = destWidth;
   const randomXaxis = Math.floor(Math.random() * 300);
+  randomNumber = Math.floor(Math.random() * 3);
+  const selectedPowerUp = propsOfPowerUps[randomNumber];
+  newPowerUp.spriteSheet = selectedPowerUp.spriteSheet;
+  newPowerUp.srcWidth = selectedPowerUp.srcWidth;
+  newPowerUp.srcHeight = selectedPowerUp.srcHeight;
+  newPowerUp.destHeight = selectedPowerUp.destHeight;
+  newPowerUp.destWidth = selectedPowerUp.destWidth;
+  totalFrames = selectedPowerUp.totalFrames;
   newPowerUp.destX = randomXaxis;
   newPowerUp.destY = -50;
   newPowerUp.gained = false;
 }, 13000);
 
-let pastTime = Date.now();
+// renders frames of animation
+let pastTimeOfPowreUpFrames = Date.now();
 const powerUpFrames = () => {
   const currentTime = Date.now();
-  const delta = currentTime - pastTime;
+  const delta = currentTime - pastTimeOfPowreUpFrames;
   if (delta >= 100) {
-    if(newPowerUp.gained) {
+    if (newPowerUp.gained) {
       totalFrames = 0;
     }
     newPowerUp.frames(totalFrames);
-    pastTime = currentTime;
+    pastTimeOfPowreUpFrames = currentTime;
   }
 };
 
@@ -96,18 +101,18 @@ const renderPowerUps = () => {
     newPowerUp.gained = true;
   }
   if (
-    newPowerUp.destY + newPowerUp.destHeight> player.y - player.height / 2 &&
+    newPowerUp.destY + newPowerUp.destHeight > player.y - player.height / 2 &&
     newPowerUp.destY < player.y + player.height / 2 &&
     newPowerUp.destX + newPowerUp.destWidth > player.x - player.height / 2 &&
     newPowerUp.destX < player.x + player.height / 2 &&
     !newPowerUp.gained
   ) {
     switch (randomNumber) {
-      case 1:
+      case 0:
         player.doubleHealth = true;
         player.health = player.maxHealth * 2;
         break;
-      case 2:
+      case 1:
         player.doubleBarrel = true;
         player.multipleBarrels();
         setTimeout(() => {
@@ -115,7 +120,7 @@ const renderPowerUps = () => {
           player.multipleBarrels();
         }, 10000);
         break;
-      case 3:
+      case 2:
         player.tripleBarrel = true;
         player.multipleBarrels();
         setTimeout(() => {
@@ -133,6 +138,14 @@ const renderPowerUps = () => {
   }
 };
 
+export const playerFunctions = () => {
+  powerUpFrames();
+  mouseController();
+  isTouchDevice && touchController();
+  renderPowerUps();
+  !player.animationFinished && player.update();
+};
+
 // let lastTime = Date.now();
 // const animateSpriteSheet = () => {
 //   const currentTime = Date.now();
@@ -141,11 +154,3 @@ const renderPowerUps = () => {
 //     lastTime = currentTime;
 //   }
 // };
-
-export const playerFunctions = () => {
-  powerUpFrames();
-  mouseController();
-  isTouchDevice && touchController();
-  renderPowerUps();
-  !player.animationFinished && player.update();
-};

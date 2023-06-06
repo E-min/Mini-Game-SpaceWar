@@ -14,18 +14,18 @@ export const touchLocation = {
   onTouch: false,
 };
 // Add a mousemove event listener to the canvas
-canvas.addEventListener('mousemove', function (event) {
+canvas.addEventListener('mousemove', (event) => {
   const rect = canvas.getBoundingClientRect();
   mouseLocation.x = event.clientX - rect.left;
   mouseLocation.y = event.clientY - rect.top;
 });
-canvas.addEventListener('mousedown', function (event) {
+canvas.addEventListener('mousedown', (event) => {
   if (event.button === 0) {
     // Check if the left mouse button is pressed
     mouseLocation.leftClick = true;
   }
 });
-canvas.addEventListener('mouseup', function (event) {
+canvas.addEventListener('mouseup', (event) => {
   if (event.button === 0) {
     // Check if the left mouse button is released
     mouseLocation.leftClick = false;
@@ -35,7 +35,7 @@ canvas.addEventListener('mouseup', function (event) {
 let touchX, touchY;
 
 // Touch start event handler
-const handleTouchStart = function (event) {
+const handleTouchStart = (event) => {
   event.preventDefault();
   const touch = event.touches[0];
   touchLocation.onTouch = true;
@@ -44,7 +44,7 @@ const handleTouchStart = function (event) {
 };
 
 // Touch move event handler
-const handleTouchMove = function (event) {
+const handleTouchMove = (event) => {
   event.preventDefault();
   const touch = event.touches[0];
   touchX = touch.clientX - canvas.offsetLeft;
@@ -52,7 +52,7 @@ const handleTouchMove = function (event) {
 };
 
 // Touch end event handler
-const handleTouchEnd = function (event) {
+const handleTouchEnd = (event) => {
   event.preventDefault();
   const touch = event.changedTouches[0];
   touchLocation.onTouch = false;

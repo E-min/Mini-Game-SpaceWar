@@ -22,6 +22,7 @@ export const gameArea = {
     requestAnimationFrame(frameRefresher);
   },
 };
+
 const backgroundFirst = new GameObjectsComponent(
   canvas.height,
   canvas.width,

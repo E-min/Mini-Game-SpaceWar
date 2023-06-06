@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
     <title>Space War</title>
-</head>
-<body>
+    <style>
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background-color: black;
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+      }
+      #canvas {
+        cursor: none;
+      }
+    </style>
+  </head>
+  <body>
     <audio id="exploison-0" src="./sounds/explosion-0.wav"></audio>
     <audio id="exploison-1" src="./sounds/explosion-1.wav"></audio>
     <audio id="exploison-2" src="./sounds/explosion-2.wav"></audio>
@@ -19,6 +35,6 @@
     <audio id="hit" src="./sounds/hit.wav"></audio>
     <audio id="powerup" src="./sounds/pickup-powerup.wav"></audio>
     <canvas id="canvas"></canvas>
-</body>
-<script type="module" src="main.js"></script>
+  </body>
+  <script type="module" src="main.js"></script>
 </html>
