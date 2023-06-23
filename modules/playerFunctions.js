@@ -3,6 +3,7 @@ import { AnimationSpriteSheet, Player } from './gameObjectsComponent.js';
 import { soundEffects } from './gameSoundEffects.js';
 import { mouseLocation } from './inputController.js';
 import { touchLocation, isTouchDevice } from './inputController.js';
+import createTimer from './stopWatch.js';
 
 export const player = new Player(175, 500, 40, 40, 'player.png', 10);
 
@@ -66,8 +67,11 @@ newPowerUp.gained = true;
 let randomNumber;
 let totalFrames;
 
-// spawn new power up
-setInterval(() => {
+// timers
+const spawnPowerUp = createTimer();
+const powerUpAnimation = createTimer();
+
+const powerUpSpawnValues = () => {
   const randomXaxis = Math.floor(Math.random() * 300);
   randomNumber = Math.floor(Math.random() * 3);
   const selectedPowerUp = propsOfPowerUps[randomNumber];
@@ -80,20 +84,6 @@ setInterval(() => {
   newPowerUp.destX = randomXaxis;
   newPowerUp.destY = -50;
   newPowerUp.gained = false;
-}, 13000);
-
-// renders frames of animation
-let pastTimeOfPowreUpFrames = Date.now();
-const powerUpFrames = () => {
-  const currentTime = Date.now();
-  const delta = currentTime - pastTimeOfPowreUpFrames;
-  if (delta >= 100) {
-    if (newPowerUp.gained) {
-      totalFrames = 0;
-    }
-    newPowerUp.frames(totalFrames);
-    pastTimeOfPowreUpFrames = currentTime;
-  }
 };
 
 const renderPowerUps = () => {
@@ -138,19 +128,16 @@ const renderPowerUps = () => {
   }
 };
 
+
 export const playerFunctions = () => {
-  powerUpFrames();
+  powerUpAnimation(
+    () => newPowerUp.frames(totalFrames),
+    100,
+    () => newPowerUp.gained
+  );
+  spawnPowerUp(powerUpSpawnValues, 13000);
   mouseController();
   isTouchDevice && touchController();
   renderPowerUps();
   !player.animationFinished && player.update();
 };
-
-// let lastTime = Date.now();
-// const animateSpriteSheet = () => {
-//   const currentTime = Date.now();
-//   const delta = currentTime - lastTime;
-//   if (delta >= 100) {
-//     lastTime = currentTime;
-//   }
-// };

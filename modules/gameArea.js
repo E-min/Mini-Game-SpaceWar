@@ -43,7 +43,7 @@ export const updateGameArea = () => {
   playerFunctions();
   enemiesFunctions();
 };
-
+//======================================
 const backgroundRepeat = () => {
   backgroundSecond.update();
   backgroundFirst.update();
