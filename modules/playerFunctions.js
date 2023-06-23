@@ -128,7 +128,6 @@ const renderPowerUps = () => {
   }
 };
 
-
 export const playerFunctions = () => {
   powerUpAnimation(
     () => newPowerUp.frames(totalFrames),
