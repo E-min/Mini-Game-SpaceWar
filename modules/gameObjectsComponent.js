@@ -421,7 +421,7 @@ export class EnemiesComponent extends GameObjectsComponent {
     const right = this.x + this.width / 2;
     const left = this.x - this.width / 2;
     for (let i = 0; i < causeOfObjects.length; i++) {
-      if(causeOfObjects[i].y < 0) {
+      if (causeOfObjects[i].y < 0) {
         causeOfObjects[i].hit = true;
       }
       // if bullet did hit, pass the collision check
@@ -476,10 +476,8 @@ export class EnemiesComponent extends GameObjectsComponent {
         const finishX = order.finishX;
         const finishY = order.finishY;
         const motionType = order.motionType;
-        if (motionType === 'straight') {
-          velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
-          velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
-        }
+        velocityX = (finishX - startX) / totalFramesOnEachAnimationSet;
+        velocityY = (finishY - startY) / totalFramesOnEachAnimationSet;
         if (animateFrames === 1) {
           this.x = startX;
           this.y = startY;

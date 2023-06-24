@@ -13,7 +13,7 @@ const enemeyPaths = [
   'A2 C2 E2 G2 I2 I4 G4 E4 C4 A4 A6 C6 E6 G6 I6 I4 G4 E4 C4 A4 K1',
 ];
 const enemyTeamsAppearingSequence = [
-  '01 00 01 00 11 10',
+  '01 00 01 00 11 10 01 00 01 00 11 10',
   '13 14 01 01 02 13 14 01 01 02',
   '11 11 11 11 11 11 11 11 11 11',
 ];
@@ -46,8 +46,7 @@ const gridTable = (...orders) => {
         startX: enemyStartPoint.x,
         startY: enemyStartPoint.y,
         finishX: xAxis,
-        finishY: yAxis,
-        motionType: 'straight',
+        finishY: yAxis
       };
       moveSets.push(moveSet);
       enemyStartPoint.x = xAxis;
@@ -55,7 +54,7 @@ const gridTable = (...orders) => {
     }
     //********************************************
     //************* iteration section*************
-    if (delta >= currentEnemies[enemyIndex].width * 10 + 500) {
+    if (delta >= 1000) {
       currentEnemies[enemyIndex].animationChain(moveSets);
       enemyIndex++;
       lastTime = currentTime;
@@ -85,7 +84,6 @@ const createNewEnemies = (sequence) => {
   // Clear the previous timer if it exists
   const sequenceFinalPath = enemeyPaths[sequence[sequence.length - 1][1]];
   const sequenceTimeLimits = sequenceFinalPath.split(' ').length * 1200 + (sequence.length * 1000);
-  console.log(sequenceTimeLimits);
   if (timerId) {
     clearTimeout(timerId);
   }
