@@ -119,6 +119,7 @@ const renderPowerUps = () => {
         }, 10000);
         break;
     }
+    soundEffects.powerup.volume = 0.2;
     soundEffects.powerup.play();
     newPowerUp.gained = true;
   }
